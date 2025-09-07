@@ -1,7 +1,7 @@
 "use client";
 import style from "../style.module.css"
 import  AntButton_primary   from "@/components/ui/antButton_primary ";
-import  Input  from "@/components/ui/antInput";
+import InputFields from "@/components/ui/antInput";
 import Input_Password  from "@/components/ui/input_password";
 import { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -62,7 +62,7 @@ export default function SignInPage() {
         <div className={style.InputContainer}>
           <p className={style.text}>E-mail</p>
 
-             <Input placeHolder={"example@gmail.com"} Status={status} inputValue={email} onInputChange={handleChangeEmail}></Input>
+             <InputFields placeHolder={"example@gmail.com"} Status={status} inputValue={email} onInputChange={handleChangeEmail}></InputFields>
        </div>
         <div className={style.InputContainer}>
           <p className={style.text}>Password</p>

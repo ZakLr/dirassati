@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 import apiCall from "@/components/utils/apiCall";
-import AntInput from "@/components/ui/antInput";
+import InputFields from "@/components/ui/antInput";
 import AntButton_primary from "@/components/ui/antButton_primary ";
 
 export default function AddChild() {
@@ -102,7 +102,7 @@ export default function AddChild() {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">First Name</label>
-          <AntInput
+          <InputFields
             type="text"
             name="first_name"
             placeHolder="Enter first name"
@@ -113,7 +113,7 @@ export default function AddChild() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Last Name</label>
-          <AntInput
+          <InputFields
             type="text"
             name="last_name"
             placeHolder="Enter last name"
@@ -124,7 +124,7 @@ export default function AddChild() {
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Email</label>
-          <AntInput
+          <InputFields
             type="email"
             name="email"
             placeHolder="Enter email"

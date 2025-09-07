@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { setToken } from "@/app/redux/features/auth/authSlice";
 import { useRouter, useSearchParams } from "next/navigation";
-import AntInput from "@/components/ui/antInput";
+import InputFields from "@/components/ui/antInput";
 import AntButton_primary from "@/components/ui/antButton_primary ";
 import apiCall from "@/components/utils/apiCall"; // Adjust the import based on your project structure
 import { useDispatch } from "react-redux";
@@ -56,7 +56,7 @@ export default function CompleteChildRegistration() {
       <form  className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-1">Password</label>
-          <AntInput
+          <InputFields
             type="password"
             placeHolder="Enter your password"
             inputValue={password}

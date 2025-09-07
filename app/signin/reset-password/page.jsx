@@ -1,7 +1,7 @@
 "use client";
 import  AntButton_primary   from "@/components/ui/antButton_primary ";
 import EmailValidation from "@/components/ui/EmailValidation";
-import Input from "@/components/ui/AntInput";
+import InputFields from "@/components/ui/antInput";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {  useDispatch,useSelector } from "react-redux";
