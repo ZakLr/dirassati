@@ -9,15 +9,11 @@ import { Eye, EyeOff } from "lucide-react";
 export default function Step1({ nextStep, setParentInfo }) {
   const [showPassword, setShowPassword] = useState(false);
 
-  // For development, you can skip validations by setting this to true.
-  const skipValidation = false;
-
   // Form state
   const [email, setEmail] = useState("");
   const [first_name, setfirst_name] = useState("");
   const [last_name, setlast_name] = useState("");
-
-  const [role, setrole] = useState("");
+  const [role, setrole] = useState("parent");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [termsChecked, setTermsChecked] = useState(false);
@@ -27,178 +23,230 @@ export default function Step1({ nextStep, setParentInfo }) {
   // Simple email regex
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-  // Mock API check (always returns false for now)
-  async function checkEmailExists(emailToCheck) {
-    return Promise.resolve(false);
-  }
+  // Mock function for dummy data
+  async function mockRegisterUser(
+    email,
+    password,
+    phone,
+    role,
+    first_name,
+    last_name
+  ) {
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  async function registerUser(email, password, phone,role,first_name,last_name) {
-    try {
-      const res = await fetch("https://dirassati.pythonanywhere.com/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json",
-          'Access-Control-Allow-Origin': '*',
-          "origin":"http://exmple.com"
-        },
-        body: JSON.stringify({ email, password, phone_number: `+123${phone}` ,role,first_name,last_name}),
-      });
-  
-      if (!res.ok) {
-        const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.message || `HTTP error! status: ${res.status}`);
-      }
-  
-      return await res.json();
-    } catch (err) {
-      console.error("Registration error:", err);
-      throw new Error(err.message || "Network request failed");
-    }
+    // Mock successful registration
+    return {
+      success: true,
+      user: {
+        id: Math.random().toString(36).substr(2, 9),
+        email,
+        first_name,
+        last_name,
+        role,
+        phone_number: phone,
+      },
+    };
   }
-  
-
 
   async function handleNext() {
-    if (skipValidation) {
-      const res=await registerUser(email, password, phone,role,first_name,last_name);
-      console.log(res)
-     
-      setParentInfo({ email, password, phone, termsChecked, offersChecked,role });
-      nextStep();
-      return;
-    }
-
     const newErrors = {};
 
     if (!emailRegex.test(email)) {
       newErrors.email = "Invalid email format.";
-    } else {
-      const emailExists = await checkEmailExists(email);
-      if (emailExists) {
-        newErrors.email = "Email already exists.";
-      }
     }
     if (password.length < 8) {
       newErrors.password = "Password must be at least 8 characters long.";
     }
-
-    if (!termsChecked) {
-      newErrors.terms = "You must agree to the Terms of use and Privacy Policy.";
+    if (!first_name.trim()) {
+      newErrors.first_name = "First name is required.";
     }
-    
+    if (!last_name.trim()) {
+      newErrors.last_name = "Last name is required.";
+    }
+    if (!phone.trim()) {
+      newErrors.phone = "Phone number is required.";
+    }
+    if (!termsChecked) {
+      newErrors.terms =
+        "You must agree to the Terms of use and Privacy Policy.";
+    }
+
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
     } else {
       setErrors({});
-      const res=await registerUser(email, password, phone,role,first_name,last_name);
-      console.log(res)
-      setParentInfo({ email, password, phone, termsChecked, offersChecked, role });
-
-      nextStep();
+      try {
+        const res = await mockRegisterUser(
+          email,
+          password,
+          phone,
+          role,
+          first_name,
+          last_name
+        );
+        console.log("Mock registration successful:", res);
+        setParentInfo({
+          email,
+          password,
+          phone,
+          termsChecked,
+          offersChecked,
+          role,
+          first_name,
+          last_name,
+        });
+        nextStep();
+      } catch (error) {
+        console.error("Mock registration failed:", error);
+        setErrors({ general: "Registration failed. Please try again." });
+      }
     }
   }
 
   return (
-    <div className="flex flex-col justify-center px-16">
-      <h1 className="text-4xl font-bold">Sign Up</h1>
-      <p className="mt-2 text-gray-600">
-        Have an account? <span className="text-red-500 cursor-pointer">Connect now</span>
-      </p>
+    <div className="w-full max-w-md mx-auto">
+      {/* Header */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Create Account
+        </h1>
+        <p className="text-gray-600">Join our educational community</p>
+      </div>
 
-      <div className="mt-6 space-y-4">
-        {/* Email */}
-        <div>
-          <Input
-            type="email"
-            placeholder="Email"
-            className="w-full"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-        </div>
+      {/* Form Card */}
+      <div className="bg-white rounded-2xl shadow-lg p-6">
+        <div className="space-y-4">
+          {/* Email */}
+          <div>
+            <Input
+              type="email"
+              placeholder="Email address"
+              className="w-full h-12 rounded-xl border-gray-200 focus:border-[#667eea] focus:ring-[#667eea]"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
+          </div>
 
-        {/* Password with Eye toggle */}
-        <div className="relative">
-          <Input
-            type={showPassword ? "text" : "password"}
-            placeholder="Password"
-            className="w-full"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button
-            type="button"
-            className="absolute right-4 top-3"
-            onClick={() => setShowPassword(!showPassword)}
+          {/* Password with Eye toggle */}
+          <div className="relative">
+            <Input
+              type={showPassword ? "text" : "password"}
+              placeholder="Password (min 8 characters)"
+              className="w-full h-12 rounded-xl border-gray-200 focus:border-[#667eea] focus:ring-[#667eea] pr-12"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button
+              type="button"
+              className="absolute right-4 top-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
+          {errors.password && (
+            <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+          )}
+
+          {/* First Name */}
+          <div>
+            <Input
+              type="text"
+              placeholder="First Name"
+              className="w-full h-12 rounded-xl border-gray-200 focus:border-[#667eea] focus:ring-[#667eea]"
+              value={first_name}
+              onChange={(e) => setfirst_name(e.target.value)}
+            />
+            {errors.first_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>
+            )}
+          </div>
+
+          {/* Last Name */}
+          <div>
+            <Input
+              type="text"
+              placeholder="Last Name"
+              className="w-full h-12 rounded-xl border-gray-200 focus:border-[#667eea] focus:ring-[#667eea]"
+              value={last_name}
+              onChange={(e) => setlast_name(e.target.value)}
+            />
+            {errors.last_name && (
+              <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>
+            )}
+          </div>
+
+          {/* Phone */}
+          <div>
+            <Input
+              type="text"
+              placeholder="Phone Number"
+              className="w-full h-12 rounded-xl border-gray-200 focus:border-[#667eea] focus:ring-[#667eea]"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+            {errors.phone && (
+              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+            )}
+          </div>
+
+          {/* Terms Checkbox */}
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="terms"
+              checked={termsChecked}
+              onCheckedChange={(checked) => setTermsChecked(checked)}
+              className="mt-1"
+            />
+            <label
+              htmlFor="terms"
+              className="text-sm text-gray-600 leading-relaxed"
+            >
+              By creating an account, you agree to the{" "}
+              <span className="text-[#667eea] hover:text-[#764ba2] cursor-pointer font-medium">
+                Terms of use
+              </span>{" "}
+              and{" "}
+              <span className="text-[#667eea] hover:text-[#764ba2] cursor-pointer font-medium">
+                Privacy Policy
+              </span>
+              .
+            </label>
+          </div>
+          {errors.terms && (
+            <p className="text-red-500 text-sm mt-1">{errors.terms}</p>
+          )}
+
+          {/* Offers Checkbox */}
+          <div className="flex items-start space-x-3">
+            <Checkbox
+              id="offers"
+              checked={offersChecked}
+              onCheckedChange={(checked) => setOffersChecked(checked)}
+              className="mt-1"
+            />
+            <label htmlFor="offers" className="text-sm text-gray-600">
+              I want to receive emails about our offers and updates.
+            </label>
+          </div>
+
+          {/* General Error */}
+          {errors.general && (
+            <p className="text-red-500 text-sm text-center">{errors.general}</p>
+          )}
+
+          {/* Next Button */}
+          <Button
+            onClick={handleNext}
+            className="w-full h-12 bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:from-[#5a6fd8] hover:to-[#6b4190] text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
-            {showPassword ? <EyeOff /> : <Eye />}
-          </button>
+            Continue
+          </Button>
         </div>
-        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-
-        {/* Confirm Password */}
-   
-        <div>
-          <Input
-            type="text"
-            placeholder="First Name"
-            className="w-full"
-            value={first_name}
-            onChange={(e) => setfirst_name(e.target.value)}
-          />
-        </div>
-        <div>
-          <Input
-            type="text"
-            placeholder="Last Name"
-            className="w-full"
-            value={last_name}
-            onChange={(e) => setlast_name(e.target.value)}
-          />
-        </div>
-        {/* Phone */}
-        <div>
-          <Input
-            type="text"
-            placeholder="Phone Number"
-            className="w-full"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-          {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone}</p>}
-        </div>
-        <div>
-          <Input
-            type="text"
-            placeholder="role"
-            className="w-full"
-            value={role}
-            onChange={(e) => setrole(e.target.value)}
-          />
-        </div>
-        {/* Terms Checkbox */}
-        <div className="flex items-center space-x-2">
-          <Checkbox id="terms" checked={termsChecked} onCheckedChange={(checked) => setTermsChecked(checked)} />
-          <label htmlFor="terms" className="text-sm">
-            By creating an account, you agree to the <span className="text-blue-500">Terms of use</span> and <span className="text-blue-500">Privacy Policy</span>.
-          </label>
-        </div>
-        {errors.terms && <p className="text-red-500 text-sm mt-1">{errors.terms}</p>}
-
-        {/* Offers Checkbox */}
-        <div className="flex items-center space-x-2">
-          <Checkbox id="offers" checked={offersChecked} onCheckedChange={(checked) => setOffersChecked(checked)} />
-          <label htmlFor="offers" className="text-sm">
-            I want to receive Emails about our offers in the future.
-          </label>
-        </div>
-        {errors.offers && <p className="text-red-500 text-sm mt-1">{errors.offers}</p>}
-
-        <Button onClick={handleNext} className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg">
-          Next
-        </Button>
       </div>
     </div>
   );

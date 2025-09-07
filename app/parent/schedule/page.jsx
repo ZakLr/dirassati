@@ -19,7 +19,199 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Globe } from "lucide-react";
+import { Calendar, Globe, GraduationCap } from "lucide-react";
+import styled from "styled-components";
+
+// Enhanced styled components matching the main page design
+const StyledContainer = styled.div`
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+`;
+
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
+const ElegantLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+`;
+
+const LogoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+  }
+`;
+
+const LogoText = styled.span`
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+`;
+
+const PageSubtitle = styled.p`
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+`;
+
+const EnhancedCard = styled(Card)`
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const SubjectCard = styled.div`
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 12px;
+  padding: 12px;
+  margin: 4px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  &.empty {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
+  }
+`;
+
+const SubjectTitle = styled.p`
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #1a1a1a;
+`;
+
+const SubjectTeacher = styled.p`
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 2px;
+`;
+
+const SubjectRoom = styled.p`
+  font-size: 11px;
+  color: #888;
+`;
+
+const TimeSlot = styled.div`
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 8px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  text-align: center;
+  border: 1px solid #e8e8e8;
+`;
+
+const DayHeader = styled.div`
+  font-weight: 700;
+  color: #1a1a1a;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+`;
+
+const ControlsContainer = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+`;
+
+const EnhancedSelect = styled(Select)`
+  .select-trigger {
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    background: #ffffff;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+  }
+`;
+
+const LanguageButton = styled(Button)`
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  }
+`;
 
 export default function ParentSchedule({ user }) {
   const [language, setLanguage] = useState("ar"); // Default: Arabic
@@ -435,144 +627,114 @@ export default function ParentSchedule({ user }) {
   }
 
   return (
-    <div
-      className="p-4 min-h-screen bg-gradient-to-b from-beige-100 to-slate-200"
-      dir={language === "ar" ? "rtl" : "ltr"}
-    >
+    <StyledContainer>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-bold text-slate-800 text-center"
-          >
-            {translations[language].title(
-              `${child?.first_name} ${child?.last_name}`
-            )}
-          </motion.h1>
-          <div className="flex items-center gap-4">
-            <Select value={selectedChild} onValueChange={setSelectedChild}>
-              <SelectTrigger className="w-48 border-slate-300">
-                <SelectValue placeholder={translations[language].selectChild} />
-              </SelectTrigger>
-              <SelectContent>
-                {students.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.first_name} {student.last_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Button
-              onClick={toggleLanguage}
-              className="bg-slate-600 hover:bg-slate-700 text-white flex items-center gap-2"
-            >
-              <Globe className="w-5 h-5" />
-              {translations[language].toggleLanguage}
-            </Button>
+        <StyledHeader>
+          <div>
+            <ElegantLogo>
+              <LogoIcon>
+                <GraduationCap size={24} color="#ffffff" />
+              </LogoIcon>
+              <LogoText>Dirassati</LogoText>
+            </ElegantLogo>
+            <PageTitle>
+              {translations[language].title(
+                `${child?.first_name} ${child?.last_name}`
+              )}
+            </PageTitle>
+            <PageSubtitle>
+              Consultez l'emploi du temps de votre enfant
+            </PageSubtitle>
           </div>
-        </div>
-        <Card className="bg-white/90 border-slate-300 shadow-xl rounded-xl">
-          <CardHeader>
-            <CardTitle className="text-slate-800 flex items-center gap-2">
-              <Calendar className="w-6 h-6 text-slate-600" />
-              {translations[language].cardTitle} - {groupName}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="bg-slate-100 hover:bg-slate-200">
-                    <TableHead
-                      className={`w-24 font-semibold text-slate-800 ${
-                        language === "ar" ? "text-right" : "text-left"
-                      }`}
-                    >
-                      {translations[language].timeLabel}
-                    </TableHead>
-                    {translations[language].days.map((day) => (
-                      <TableHead
-                        key={day}
-                        className="text-center text-slate-800 font-semibold"
-                      >
-                        {day}
-                      </TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {hours.map((hour) => (
-                    <TableRow
-                      key={hour}
-                      className="hover:bg-slate-50 transition-colors"
-                    >
-                      <TableCell
-                        className={`font-semibold text-slate-800 ${
-                          language === "ar" ? "text-right" : "text-left"
-                        }`}
-                      >
-                        {hour}
-                      </TableCell>
-                      {translations[language].days.map((day, index) => (
-                        <TableCell
-                          key={`${hour}-${day}`}
-                          className={`p-2 ${
-                            timetables[groupId]?.[
-                              translations.ar.days[index]
-                            ]?.[hour]
-                              ? subjectColors[
-                                  timetables[groupId][
-                                    translations.ar.days[index]
-                                  ][hour].subject
-                                ] || "bg-slate-500"
-                              : "bg-slate-100"
-                          } text-white`}
-                        >
-                          {timetables[groupId]?.[translations.ar.days[index]]?.[
-                            hour
-                          ] ? (
-                            <div>
-                              <p className="font-semibold">
-                                {
-                                  translations[language].subjects[
-                                    timetables[groupId][
-                                      translations.ar.days[index]
-                                    ][hour].subject
-                                  ]
+        </StyledHeader>
+
+        <ControlsContainer>
+          <Select value={selectedChild} onValueChange={setSelectedChild}>
+            <SelectTrigger className="w-48 border-slate-300 rounded-lg shadow-sm">
+              <SelectValue placeholder={translations[language].selectChild} />
+            </SelectTrigger>
+            <SelectContent>
+              {students.map((student) => (
+                <SelectItem key={student.id} value={student.id}>
+                  {student.first_name} {student.last_name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <LanguageButton onClick={toggleLanguage}>
+            <Globe className="w-5 h-5 mr-2" />
+            {translations[language].toggleLanguage}
+          </LanguageButton>
+        </ControlsContainer>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <EnhancedCard>
+            <CardHeader>
+              <CardTitle className="text-slate-800 flex items-center gap-2">
+                <Calendar className="w-6 h-6 text-slate-600" />
+                {translations[language].cardTitle} - {groupName}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                {translations[language].days.map((day, dayIndex) => (
+                  <motion.div
+                    key={day}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3, delay: dayIndex * 0.1 }}
+                  >
+                    <DayHeader>{day}</DayHeader>
+                    <div className="space-y-2">
+                      {hours.map((hour) => {
+                        const session =
+                          timetables[groupId]?.[
+                            translations.ar.days[dayIndex]
+                          ]?.[hour];
+                        return (
+                          <div key={hour}>
+                            <TimeSlot>{hour}</TimeSlot>
+                            {session ? (
+                              <SubjectCard
+                                className={
+                                  subjectColors[session.subject] ||
+                                  "bg-slate-500"
                                 }
-                              </p>
-                              <p className="text-sm">
-                                {
-                                  timetables[groupId][
-                                    translations.ar.days[index]
-                                  ][hour].teacher
-                                }
-                              </p>
-                              <p className="text-sm">
-                                {
-                                  timetables[groupId][
-                                    translations.ar.days[index]
-                                  ][hour].room
-                                }
-                              </p>
-                            </div>
-                          ) : (
-                            <p className="text-slate-400 text-center">
-                              {translations[language].noSession}
-                            </p>
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                              >
+                                <SubjectTitle>
+                                  {
+                                    translations[language].subjects[
+                                      session.subject
+                                    ]
+                                  }
+                                </SubjectTitle>
+                                <SubjectTeacher>
+                                  {session.teacher}
+                                </SubjectTeacher>
+                                <SubjectRoom>{session.room}</SubjectRoom>
+                              </SubjectCard>
+                            ) : (
+                              <SubjectCard className="empty">
+                                <p className="text-slate-400 text-center text-sm">
+                                  {translations[language].noSession}
+                                </p>
+                              </SubjectCard>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </EnhancedCard>
+        </motion.div>
       </div>
-    </div>
+    </StyledContainer>
   );
 }

@@ -42,6 +42,7 @@ import {
   ChevronDown,
   ChevronUp,
   PlusCircle,
+  GraduationCap,
 } from "lucide-react";
 import { loadStripe } from "@stripe/stripe-js";
 import {
@@ -50,19 +51,197 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import apiCall from "@/components/utils/apiCall"; 
-import { useDispatch,useSelector } from "react-redux";// Assuming you have an apiCall utility function
+import apiCall from "@/components/utils/apiCall";
+import { useDispatch, useSelector } from "react-redux";
 import clsx from "clsx";
+import styled from "styled-components";
 
 const stripePromise = loadStripe(
   "pk_test_51RS3zNPq3NiYKo7rr5EALXBIEjXBjObVT9AOOGDK1W16BUcabN4Ej9gyUKAplz0lT2cDBJXzTD3d9Xr1oCal8fN300j4MPdKUH"
 );
+
+// Enhanced styled components matching the main page design
+const StyledContainer = styled.div`
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+`;
+
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
+const ElegantLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+`;
+
+const LogoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+  }
+`;
+
+const LogoText = styled.span`
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+`;
+
+const PageSubtitle = styled.p`
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+`;
+
+const EnhancedCard = styled(Card)`
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const SummaryCard = styled.div`
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  text-align: center;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const SummaryValue = styled.p`
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-top: 8px;
+`;
+
+const SummaryLabel = styled.p`
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+`;
+
+const ControlsContainer = styled.div`
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+`;
+
+const EnhancedInput = styled(Input)`
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  background: #ffffff;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+`;
+
+const EnhancedSelect = styled(Select)`
+  .select-trigger {
+    border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    background: #ffffff;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+    }
+  }
+`;
+
+const ActionButton = styled(Button)`
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  }
+`;
+
+const SecondaryButton = styled(Button)`
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  background: #ffffff;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #f8f9fa;
+    transform: translateY(-1px);
+  }
+`;
+
 // Assuming you have a Redux store setup
 function PaymentForm({ onPaymentSuccess }) {
   const stripe = useStripe();
   const elements = useElements();
- 
-  
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -117,7 +296,7 @@ function PaymentForm({ onPaymentSuccess }) {
 }
 
 export default function ParentPayments({ user }) {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("date");
@@ -126,48 +305,195 @@ export default function ParentPayments({ user }) {
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [historiqueTransaction,setHistoriqueTransaction] = useState([]);
-  const[totalPaid, setTotalPaid] = useState(0);
+  const [historiqueTransaction, setHistoriqueTransaction] = useState([]);
+  const [totalPaid, setTotalPaid] = useState(0);
   const [totalUnpaid, setTotalUnpaid] = useState(0);
   const [totalOverdue, setTotalOverdue] = useState(0);
 
-  const paymentsPerPage = 2;
- const authToken = useSelector((state) => state.auth.accessToken);
- console.log(authToken)
+  const paymentsPerPage = 5;
+  // Dummy data for payments
+  const dummyPayments = [
+    {
+      id: "fee_001",
+      amount: 150000, // 1500.00 DZD in cents
+      currency: "DZD",
+      status: "paid",
+      created: "2024-09-01",
+      payment_method: {
+        type: "card",
+        brand: "visa",
+        last4: "1234",
+      },
+      description: "Frais de scolarité annuels - Amina Bouchama",
+      student_ids: ["s1"],
+      invoice_id: "inv_001",
+      frequency: "annual",
+      tax_rate: 17,
+      notes: "Paiement des frais scolaires pour l'année académique 2024-2025",
+    },
+    {
+      id: "fee_002",
+      amount: 150000, // 1500.00 DZD in cents
+      currency: "DZD",
+      status: "paid",
+      created: "2024-09-01",
+      payment_method: {
+        type: "card",
+        brand: "mastercard",
+        last4: "5678",
+      },
+      description: "Frais de scolarité annuels - Youssef Bouchama",
+      student_ids: ["s2"],
+      invoice_id: "inv_002",
+      frequency: "annual",
+      tax_rate: 17,
+      notes: "Paiement des frais scolaires pour l'année académique 2024-2025",
+    },
+    {
+      id: "fee_003",
+      amount: 75000, // 750.00 DZD in cents
+      currency: "DZD",
+      status: "unpaid",
+      created: "2024-10-01",
+      payment_method: {
+        type: "card",
+        brand: "visa",
+        last4: "1234",
+      },
+      description: "Frais d'examen trimestriel - Amina Bouchama",
+      student_ids: ["s1"],
+      invoice_id: "inv_003",
+      frequency: "quarterly",
+      tax_rate: 17,
+      notes: "Frais d'examen pour le premier trimestre",
+    },
+    {
+      id: "fee_004",
+      amount: 75000, // 750.00 DZD in cents
+      currency: "DZD",
+      status: "unpaid",
+      created: "2024-10-01",
+      payment_method: {
+        type: "card",
+        brand: "mastercard",
+        last4: "5678",
+      },
+      description: "Frais d'examen trimestriel - Youssef Bouchama",
+      student_ids: ["s2"],
+      invoice_id: "inv_004",
+      frequency: "quarterly",
+      tax_rate: 17,
+      notes: "Frais d'examen pour le premier trimestre",
+    },
+    {
+      id: "fee_005",
+      amount: 50000, // 500.00 DZD in cents
+      currency: "DZD",
+      status: "overdue",
+      created: "2024-08-15",
+      payment_method: {
+        type: "card",
+        brand: "visa",
+        last4: "1234",
+      },
+      description: "Frais d'inscription - Amina Bouchama",
+      student_ids: ["s1"],
+      invoice_id: "inv_005",
+      frequency: "one-time",
+      tax_rate: 17,
+      notes:
+        "Frais d'inscription pour l'année académique 2024-2025 (en retard)",
+    },
+    {
+      id: "fee_006",
+      amount: 25000, // 250.00 DZD in cents
+      currency: "DZD",
+      status: "paid",
+      created: "2024-08-20",
+      payment_method: {
+        type: "card",
+        brand: "mastercard",
+        last4: "5678",
+      },
+      description: "Frais de bibliothèque - Youssef Bouchama",
+      student_ids: ["s2"],
+      invoice_id: "inv_006",
+      frequency: "monthly",
+      tax_rate: 17,
+      notes: "Frais d'abonnement à la bibliothèque",
+    },
+    {
+      id: "fee_007",
+      amount: 100000, // 1000.00 DZD in cents
+      currency: "DZD",
+      status: "paid",
+      created: "2024-07-15",
+      payment_method: {
+        type: "card",
+        brand: "visa",
+        last4: "1234",
+      },
+      description: "Frais d'activités parascolaires - Amina Bouchama",
+      student_ids: ["s1"],
+      invoice_id: "inv_007",
+      frequency: "semesterly",
+      tax_rate: 17,
+      notes: "Frais pour les activités sportives et culturelles",
+    },
+    {
+      id: "fee_008",
+      amount: 20000, // 200.00 DZD in cents
+      currency: "DZD",
+      status: "unpaid",
+      created: "2024-09-15",
+      payment_method: {
+        type: "card",
+        brand: "mastercard",
+        last4: "5678",
+      },
+      description: "Frais de cantine - Youssef Bouchama",
+      student_ids: ["s2"],
+      invoice_id: "inv_008",
+      frequency: "monthly",
+      tax_rate: 17,
+      notes: "Frais de repas scolaires pour le mois de septembre",
+    },
+  ];
+
   useEffect(() => {
-    const fetchFees = async () => {
-      try {
-        const response = await apiCall("get", "/api/fees/?parent_id=1&page=1&per_page=1", null, {
-          token: authToken,
-        });
+    // Initialize with dummy data
+    setHistoriqueTransaction(dummyPayments);
 
-        const fees = response.fees;
-        setHistoriqueTransaction(fees)
-        const totalPaidtmp = response.total
-          .filter((fee) => fee.status === "paid")
-          .reduce((sum, fee) => sum + fee.amount, 0);
-        const totalUnpaidtmp = fees
-          .filter((fee) => fee.status === "unpaid")
-          .reduce((sum, fee) => sum + fee.amount, 0);
-        const totalOverduetmp = fees
-          .filter((fee) => fee.status === "overdue")
-          .reduce((sum, fee) => sum + fee.amount, 0);
+    // Calculate totals from dummy data
+    const totalPaidAmount = dummyPayments
+      .filter((fee) => fee.status === "paid")
+      .reduce((sum, fee) => sum + fee.amount, 0);
 
-        setTotalPaid(totalPaidtmp);
-        setTotalUnpaid(totalUnpaidtmp);
-        setTotalOverdue(totalOverduetmp);
-      } catch (error) {
-        console.error("Error fetching fees:", error);
-      }
-    };
+    const totalUnpaidAmount = dummyPayments
+      .filter((fee) => fee.status === "unpaid")
+      .reduce((sum, fee) => sum + fee.amount, 0);
 
-    fetchFees();
-  }, [authToken]);
+    const totalOverdueAmount = dummyPayments
+      .filter((fee) => fee.status === "overdue")
+      .reduce((sum, fee) => sum + fee.amount, 0);
 
+    setTotalPaid(totalPaidAmount);
+    setTotalUnpaid(totalUnpaidAmount);
+    setTotalOverdue(totalOverdueAmount);
+
+    // Update summary stats
+    setSummary({
+      total_paid: totalPaidAmount,
+      total_pending: totalUnpaidAmount,
+      total_refunded: totalOverdueAmount,
+    });
+
+    setIsLoading(false);
+  }, []);
 
   const [paymentForm, setPaymentForm] = useState({
     student_ids: ["s1", "s2"], // Default: Amina and Youssef
-    amount: "150000", // 1500.00 DZD in cents
+    amount: 150000, // 1500.00 DZD in cents
   });
 
   // Hardcoded students
@@ -184,24 +510,27 @@ export default function ParentPayments({ user }) {
     email: "contact@dirassati.dz",
   };
 
-  // initialPayments replaced with historiqueTransaction data
+  // Convert dummy data to payment format
   const initialPayments = historiqueTransaction.map((transaction) => ({
     id: transaction.id,
-    amount: transaction.amount, // Amount in DZD
-    currency: "DZD",
-    status: transaction.status,
-    created: transaction.due_date,
-    payment_method: {
-      type: "card",
-      brand: "visa",
-      last4: "1234",
-    },
+    amount: transaction.amount,
+    currency: transaction.currency,
+    status:
+      transaction.status === "paid"
+        ? "succeeded"
+        : transaction.status === "unpaid"
+        ? "pending"
+        : transaction.status === "overdue"
+        ? "failed"
+        : transaction.status,
+    created: transaction.created,
+    payment_method: transaction.payment_method,
     description: transaction.description,
-    student_ids: [], // Removed as per requirement
-    invoice_id: `in_${transaction.id}`,
-    frequency: "annual", // Default value
-    tax_rate: 0, // Default VAT
-    notes: "",
+    student_ids: transaction.student_ids,
+    invoice_id: transaction.invoice_id,
+    frequency: transaction.frequency,
+    tax_rate: transaction.tax_rate,
+    notes: transaction.notes,
   }));
 
   // State for payments
@@ -209,15 +538,10 @@ export default function ParentPayments({ user }) {
 
   // Summary stats
   const [summary, setSummary] = useState({
-    total_paid: initialPayments
-      .filter((p) => p.status === "succeeded")
-      .reduce((sum, p) => sum + p.amount, 0), // 1500.00 + 1000.00 = 2500.00 DZD
+    total_paid: 0,
     total_pending: 0,
-    total_refunded: initialPayments
-      .filter((p) => p.status === "refunded")
-      .reduce((sum, p) => sum + p.amount, 0), // 800.00 DZD
+    total_refunded: 0,
   });
- 
 
   // Mock filter/sort function
   const filteredPayments = payments.filter((payment) => {
@@ -297,10 +621,11 @@ export default function ParentPayments({ user }) {
       ...prev,
       total_paid: prev.total_paid + parseInt(paymentForm.amount),
     }));
+    setTotalPaid((prev) => prev + parseInt(paymentForm.amount));
     setIsPaymentModalOpen(false);
     setPaymentForm({
       student_ids: ["s1", "s2"],
-      amount: "150000",
+      amount: 150000,
     });
     alert("Paiement simulé avec succès !");
   };
@@ -315,41 +640,43 @@ export default function ParentPayments({ user }) {
     alert(`Paiement réussi avec la méthode: ${paymentMethod.id}`);
   };
 
-  if (!authToken) {
+  if (isLoading) {
     return <div className="p-6 text-center text-slate-800">Chargement...</div>;
   }
 
   return (
     <Elements stripe={stripePromise}>
-      <div className="p-4 min-h-screen bg-gradient-to-b from-beige-100 to-slate-200">
+      <StyledContainer>
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-8">
-            <motion.h1
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="text-4xl font-bold text-slate-800"
-            >
-              Gestion des paiements
-            </motion.h1>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                className="bg-[#0771CB] hover:bg-[#055a9e] text-white rounded-lg"
-                onClick={() => setIsPaymentModalOpen(true)}
-              >
-                <PlusCircle className="w-4 h-4 mr-2" />
-                Nouveau paiement
-              </Button>
-            </motion.div>
-          </div>
+          <StyledHeader>
+            <div>
+              <ElegantLogo>
+                <LogoIcon>
+                  <GraduationCap size={24} color="#ffffff" />
+                </LogoIcon>
+                <LogoText>Dirassati</LogoText>
+              </ElegantLogo>
+              <PageTitle>Gestion des paiements</PageTitle>
+              <PageSubtitle>
+                Gérez vos paiements scolaires en toute sécurité
+              </PageSubtitle>
+            </div>
+          </StyledHeader>
+
+          <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <ActionButton onClick={() => setIsPaymentModalOpen(true)}>
+              <PlusCircle className="w-4 h-4 mr-2" />
+              Nouveau paiement
+            </ActionButton>
+          </motion.div>
 
           {/* Summary Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2}}
+            transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Card className="bg-white/90 border-slate-300 shadow-xl rounded-xl mb-6">
+            <EnhancedCard className="mb-6">
               <CardHeader>
                 <CardTitle className="text-slate-800 flex items-center gap-2">
                   <CreditCard className="w-6 h-6 text-slate-600" />
@@ -358,27 +685,27 @@ export default function ParentPayments({ user }) {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <p className="text-sm text-slate-600">Total payé</p>
-                    <p className="text-2xl font-semibold text-[#0771CB]">
+                  <SummaryCard>
+                    <SummaryLabel>Total payé</SummaryLabel>
+                    <SummaryValue style={{ color: "#0771CB" }}>
                       {formatAmount(totalPaid, "DZD")}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-slate-600">Total en attente</p>
-                    <p className="text-2xl font-semibold text-slate-800">
+                    </SummaryValue>
+                  </SummaryCard>
+                  <SummaryCard>
+                    <SummaryLabel>Total en attente</SummaryLabel>
+                    <SummaryValue style={{ color: "#f59e0b" }}>
                       {formatAmount(totalUnpaid, "DZD")}
-                    </p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-slate-600">Total remboursé</p>
-                    <p className="text-2xl font-semibold text-slate-800">
+                    </SummaryValue>
+                  </SummaryCard>
+                  <SummaryCard>
+                    <SummaryLabel>Total remboursé</SummaryLabel>
+                    <SummaryValue style={{ color: "#ef4444" }}>
                       {formatAmount(totalOverdue, "DZD")}
-                    </p>
-                  </div>
+                    </SummaryValue>
+                  </SummaryCard>
                 </div>
               </CardContent>
-            </Card>
+            </EnhancedCard>
           </motion.div>
 
           {/* Filters and Actions */}
@@ -386,17 +713,16 @@ export default function ParentPayments({ user }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6"
           >
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <Input
+            <ControlsContainer>
+              <EnhancedInput
                 placeholder="Rechercher par ID de transaction..."
-                className="w-full sm:w-64 border-slate-300 rounded-lg shadow-sm"
+                className="w-full sm:w-64"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-full sm:w-40 border-slate-300 rounded-lg shadow-sm">
+                <SelectTrigger className="w-full sm:w-40">
                   <SelectValue placeholder="Filtrer par statut" />
                 </SelectTrigger>
                 <SelectContent>
@@ -406,9 +732,7 @@ export default function ParentPayments({ user }) {
                   <SelectItem value="refunded">Remboursé</SelectItem>
                 </SelectContent>
               </Select>
-              <Button
-                variant="outline"
-                className="border-slate-300 text-slate-800 hover:bg-slate-100 rounded-lg"
+              <SecondaryButton
                 onClick={() => {
                   setSearchQuery("");
                   setStatusFilter("all");
@@ -416,15 +740,14 @@ export default function ParentPayments({ user }) {
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Réinitialiser
-              </Button>
-            </div>
-            <Button
-              className="bg-[#0771CB] hover:bg-[#055a9e] text-white rounded-lg"
-              onClick={() => alert("Exportation CSV non implémentée")}
-            >
-              <Download className="w-4 h-4 mr-2" />
-              Exporter en CSV
-            </Button>
+              </SecondaryButton>
+              <ActionButton
+                onClick={() => alert("Exportation CSV non implémentée")}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Exporter en CSV
+              </ActionButton>
+            </ControlsContainer>
           </motion.div>
 
           {/* Payment Table */}
@@ -433,7 +756,7 @@ export default function ParentPayments({ user }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <Card className="bg-white/90 border-slate-300 shadow-xl rounded-xl">
+            <EnhancedCard>
               <CardHeader>
                 <CardTitle className="text-slate-800">
                   Historique des transactions
@@ -604,26 +927,22 @@ export default function ParentPayments({ user }) {
                     sur {sortedPayments.length} paiement(s)
                   </p>
                   <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      className="border-slate-300 rounded-lg"
+                    <SecondaryButton
                       onClick={() => setCurrentPage((prev) => prev - 1)}
                       disabled={currentPage === 1}
                     >
                       Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="border-slate-300 rounded-lg"
+                    </SecondaryButton>
+                    <SecondaryButton
                       onClick={() => setCurrentPage((prev) => prev + 1)}
                       disabled={currentPage === totalPages}
                     >
                       Suivant
-                    </Button>
+                    </SecondaryButton>
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </EnhancedCard>
           </motion.div>
 
           {/* Payment Modal */}
@@ -677,7 +996,7 @@ export default function ParentPayments({ user }) {
                         type="number"
                         placeholder="1500.00"
                         className="w-full border-slate-300 rounded-lg shadow-sm"
-                        value={totalUnpaid / 100}
+                        value={totalUnpaid / 100 || ""}
                         onChange={(e) =>
                           setPaymentForm({
                             ...paymentForm,
@@ -707,7 +1026,9 @@ export default function ParentPayments({ user }) {
                           <SelectItem value="card_visa_1234">
                             Visa ****1234
                           </SelectItem>
-                          <SelectItem value="new_card">Nouvelle carte</SelectItem>
+                          <SelectItem value="new_card">
+                            Nouvelle carte
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       {paymentForm.payment_method === "new_card" && (
@@ -722,7 +1043,9 @@ export default function ParentPayments({ user }) {
                           />
                           <div className="flex gap-2 mt-2">
                             <div>
-                              <p className="text-sm text-slate-600">Expiration</p>
+                              <p className="text-sm text-slate-600">
+                                Expiration
+                              </p>
                               <Input
                                 placeholder="MM/AA"
                                 className="mt-1 border-slate-300 rounded-lg"
@@ -809,7 +1132,9 @@ export default function ParentPayments({ user }) {
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-slate-600">ID Transaction</p>
+                          <p className="text-sm text-slate-600">
+                            ID Transaction
+                          </p>
                           <p className="text-slate-800">{selectedInvoice.id}</p>
                         </div>
                         <div>
@@ -849,7 +1174,9 @@ export default function ParentPayments({ user }) {
                           <p className="text-slate-800">
                             {selectedInvoice.student_ids
                               .map((id) => {
-                                const student = students.find((s) => s.id === id);
+                                const student = students.find(
+                                  (s) => s.id === id
+                                );
                                 return student
                                   ? `${student.first_name} ${student.last_name}`
                                   : "";
@@ -950,7 +1277,7 @@ export default function ParentPayments({ user }) {
             )}
           </AnimatePresence>
         </div>
-      </div>
+      </StyledContainer>
     </Elements>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { setUserProfile } from "../redux/features/userinfoSlice";
 import {
   Card as AntCard,
   Col,
@@ -37,7 +39,6 @@ import {
 import dynamic from "next/dynamic";
 import { Card as ShadcnCard } from "@/components/ui/card";
 import styled from "styled-components";
-import { GraduationCap } from "lucide-react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -55,56 +56,6 @@ const StyledHeader = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-`;
-
-const ElegantLogo = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 16px;
-`;
-
-const LogoIcon = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: scale(1.05);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
-  }
-`;
-
-const LogoText = styled.span`
-  font-size: 2.2rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -1px;
-  font-family: "Inter", "Segoe UI", sans-serif;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: relative;
-
-  &::after {
-    content: "";
-    position: absolute;
-    bottom: -4px;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-    border-radius: 2px;
-    opacity: 0.8;
-  }
 `;
 
 const StyledSubHeader = styled.h2`
@@ -249,83 +200,92 @@ export default function Home() {
     searchParams.get("timeRange") || "monthly"
   );
 
-  // Enhanced dummy data for teacher dashboard
+  // Enhanced dummy data for portfolio showcase
   const statsData = [
     {
-      name: "My Students",
-      value: 145,
-      change: "+8.2%",
+      name: "My Children",
+      value: 2,
+      change: "+1 this year",
       color: "#667eea",
-      info: "Students in your classes",
+      info: "Children enrolled in the school",
       icon: <UserOutlined />,
     },
     {
-      name: "Classes Today",
-      value: 4,
-      change: "Same",
+      name: "Average Grade",
+      value: 92.5,
+      suffix: "%",
       color: "#764ba2",
-      info: "Active classes scheduled",
-      icon: <BookOutlined />,
-    },
-    {
-      name: "Assignments Due",
-      value: 12,
-      change: "+3",
-      color: "#f093fb",
-      info: "Pending assignments to grade",
+      info: "Combined average across all subjects",
       icon: <TrophyOutlined />,
     },
     {
-      name: "Class Average",
-      value: 87.5,
+      name: "Attendance Rate",
+      value: 96.8,
       suffix: "%",
-      color: "#4facfe",
-      info: "Overall class performance",
+      color: "#f093fb",
+      info: "Overall attendance this term",
       icon: <CheckCircleOutlined />,
+    },
+    {
+      name: "Upcoming Events",
+      value: 5,
+      change: "This week",
+      color: "#4facfe",
+      info: "School events and activities",
+      icon: <CalendarOutlined />,
     },
   ];
 
   const announcements = [
     {
       id: 1,
-      title: "Mid-term Exams Next Week",
-      message:
-        "Grade 10 Mathematics and Science exams scheduled for Monday and Wednesday.",
+      title: "Parent-Teacher Conference",
+      message: "Scheduled for next Friday, 2:00 PM - 6:00 PM",
       type: "important",
       date: "2024-01-15",
     },
     {
       id: 2,
-      title: "Parent-Teacher Meeting",
-      message:
-        "Individual meetings scheduled for next Friday. Please prepare student reports.",
+      title: "School Holiday Notice",
+      message: "Winter break starts December 20th and ends January 5th",
       type: "info",
       date: "2024-01-10",
     },
     {
       id: 3,
-      title: "New Curriculum Materials",
-      message:
-        "Updated textbooks and digital resources available in the library.",
+      title: "New Online Portal Features",
+      message: "Check out the new messaging system and grade tracking features",
       type: "update",
       date: "2024-01-08",
     },
   ];
 
-  const teacherData = {
-    name: "Ms. Sarah Johnson",
-    role: "Mathematics Teacher",
-    avatar: "SJ",
-    experience: "8 years",
-    department: "Mathematics",
-    nextClass: "Grade 10 Math - 10:00 AM",
-  };
+  const childrenData = [
+    {
+      name: "Sarah Johnson",
+      grade: "10th Grade",
+      avatar: "SJ",
+      attendance: 98,
+      averageGrade: 94.2,
+      subjects: ["Math A", "English A+", "Science A", "History B+"],
+      nextClass: "Mathematics - 2:00 PM",
+    },
+    {
+      name: "Michael Johnson",
+      grade: "7th Grade",
+      avatar: "MJ",
+      attendance: 95,
+      averageGrade: 90.8,
+      subjects: ["Math B+", "English A", "Science B", "Art A"],
+      nextClass: "Science Lab - 10:30 AM",
+    },
+  ];
 
   const recentActivities = [
     {
       id: 1,
       type: "grade",
-      title: "Graded Algebra assignment for Grade 9",
+      title: "Sarah received A+ in Mathematics",
       time: "2 hours ago",
       icon: <TrophyOutlined />,
       color: "#52c41a",
@@ -333,23 +293,23 @@ export default function Home() {
     {
       id: 2,
       type: "attendance",
-      title: "Marked attendance for Calculus class",
+      title: "Michael marked present for Science class",
       time: "4 hours ago",
       icon: <CheckCircleOutlined />,
       color: "#1890ff",
     },
     {
       id: 3,
-      type: "assignment",
-      title: "Posted new homework assignment",
+      type: "message",
+      title: "New message from Teacher Johnson",
       time: "1 day ago",
-      icon: <BookOutlined />,
+      icon: <MessageOutlined />,
       color: "#fa8c16",
     },
     {
       id: 4,
-      type: "meeting",
-      title: "Attended faculty meeting",
+      type: "event",
+      title: "School play rehearsal scheduled",
       time: "2 days ago",
       icon: <CalendarOutlined />,
       color: "#722ed1",
@@ -360,23 +320,29 @@ export default function Home() {
     switch (timeRange) {
       case "daily":
         return [
-          { name: "Class Performance", data: [85, 87, 86, 89, 88, 90, 87] },
-          { name: "Attendance Rate", data: [92, 94, 93, 95, 96, 94, 97] },
+          { name: "Sarah's Performance", data: [88, 92, 90, 94, 96, 93, 95] },
+          { name: "Michael's Performance", data: [85, 87, 89, 88, 91, 90, 92] },
+          { name: "Class Average", data: [82, 84, 86, 85, 87, 89, 88] },
         ];
       case "weekly":
         return [
-          { name: "Class Performance", data: [84, 86, 85, 88, 87, 89, 86] },
-          { name: "Attendance Rate", data: [91, 93, 92, 94, 95, 93, 96] },
+          { name: "Sarah's Performance", data: [89, 91, 93, 92, 94, 96, 95] },
+          { name: "Michael's Performance", data: [86, 88, 87, 90, 89, 91, 93] },
+          { name: "Class Average", data: [83, 85, 84, 86, 88, 87, 89] },
         ];
       default:
         return [
           {
-            name: "Class Performance",
-            data: [82, 84, 83, 86, 85, 87, 84, 86, 85, 88, 87, 89],
+            name: "Sarah's Performance",
+            data: [85, 87, 89, 91, 93, 90, 92, 94, 96, 95, 97, 94],
           },
           {
-            name: "Attendance Rate",
-            data: [90, 92, 91, 93, 94, 92, 95, 93, 96, 94, 97, 95],
+            name: "Michael's Performance",
+            data: [82, 84, 86, 85, 87, 89, 88, 90, 92, 91, 93, 90],
+          },
+          {
+            name: "Class Average",
+            data: [80, 82, 81, 83, 85, 84, 86, 88, 87, 89, 87, 88],
           },
         ];
     }
@@ -384,7 +350,7 @@ export default function Home() {
 
   const areaOptions = {
     chart: {
-      id: "class-performance",
+      id: "performance-trends",
       toolbar: {
         show: true,
         tools: { download: true, zoom: true, pan: true, reset: true },
@@ -420,24 +386,14 @@ export default function Home() {
               "Dec",
             ],
     },
-    colors: ["#667eea", "#764ba2"],
+    colors: ["#667eea", "#764ba2", "#f093fb"],
     fill: {
       type: "gradient",
       gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3 },
     },
     stroke: { curve: "smooth", width: 3 },
     dataLabels: { enabled: false },
-    tooltip: {
-      theme: "light",
-      y: {
-        formatter: (val) =>
-          `${val}${
-            timeRange === "daily"
-              ? ""
-              : "% for attendance, " + val + " for performance"
-          }`,
-      },
-    },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val}%` } },
     grid: { borderColor: "#e8e8e8", strokeDashArray: 4 },
     legend: { position: "top", horizontalAlign: "left", fontSize: "14px" },
     markers: { size: 5, strokeWidth: 2, strokeColors: "#fff" },
@@ -451,13 +407,7 @@ export default function Home() {
       animations: { enabled: true },
     },
     xaxis: {
-      categories: [
-        "Algebra",
-        "Geometry",
-        "Calculus",
-        "Statistics",
-        "Trigonometry",
-      ],
+      categories: ["Mathematics", "English", "Science", "History", "Art", "PE"],
     },
     colors: ["#667eea"],
     plotOptions: {
@@ -472,18 +422,18 @@ export default function Home() {
       offsetY: -20,
       style: { fontSize: "12px", colors: ["#304758"] },
     },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val}% average` } },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val}%` } },
     grid: { borderColor: "#e8e8e8" },
   };
-  const barSeries = [{ name: "Average Grade", data: [88, 85, 92, 87, 89] }];
+  const barSeries = [{ name: "Average Grade", data: [94, 92, 89, 91, 96, 88] }];
 
   const donutOptions = {
     chart: {
-      id: "assignment-status",
+      id: "attendance-breakdown",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
-    labels: ["Graded", "Pending", "Overdue", "Submitted"],
+    labels: ["Present", "Late", "Absent", "Excused"],
     colors: ["#52c41a", "#fa8c16", "#f5222d", "#1890ff"],
     dataLabels: { enabled: true, formatter: (val) => `${val.toFixed(1)}%` },
     legend: { position: "bottom", fontSize: "14px" },
@@ -491,19 +441,16 @@ export default function Home() {
       pie: {
         donut: {
           size: "70%",
-          labels: {
-            show: true,
-            total: { show: true, label: "Total Assignments" },
-          },
+          labels: { show: true, total: { show: true, label: "Total Days" } },
         },
       },
     },
   };
-  const donutSeries = [65.2, 24.3, 5.1, 5.4];
+  const donutSeries = [89.2, 7.3, 2.1, 1.4];
 
   const heatmapOptions = {
     chart: {
-      id: "class-engagement",
+      id: "weekly-activity",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
@@ -525,43 +472,43 @@ export default function Home() {
     yaxis: {
       categories: ["8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM"],
     },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val} students` } },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val} activities` } },
   };
   const heatmapSeries = [
-    { name: "8 AM", data: [8, 9, 10, 9, 8] },
-    { name: "9 AM", data: [12, 13, 14, 13, 12] },
-    { name: "10 AM", data: [15, 16, 17, 16, 15] },
-    { name: "11 AM", data: [13, 14, 15, 14, 13] },
-    { name: "12 PM", data: [10, 11, 12, 11, 10] },
-    { name: "1 PM", data: [12, 13, 14, 13, 12] },
-    { name: "2 PM", data: [8, 9, 10, 9, 8] },
+    { name: "8 AM", data: [2, 3, 4, 3, 2] },
+    { name: "9 AM", data: [4, 5, 6, 5, 4] },
+    { name: "10 AM", data: [6, 7, 8, 7, 6] },
+    { name: "11 AM", data: [5, 6, 7, 6, 5] },
+    { name: "12 PM", data: [3, 4, 5, 4, 3] },
+    { name: "1 PM", data: [4, 5, 6, 5, 4] },
+    { name: "2 PM", data: [2, 3, 4, 3, 2] },
   ];
 
   const polarOptions = {
     chart: {
-      id: "teaching-metrics",
+      id: "subject-satisfaction",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
     labels: [
-      "Student Engagement",
-      "Assignment Completion",
-      "Class Participation",
-      "Test Performance",
-      "Homework Submission",
+      "Teaching Quality",
+      "Resources",
+      "Communication",
+      "Facilities",
+      "Activities",
     ],
     colors: ["#667eea", "#764ba2", "#f093fb", "#4facfe", "#00f2fe"],
     fill: { opacity: 0.8 },
     stroke: { width: 2 },
     dataLabels: { enabled: true },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val}/100` } },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val}/5` } },
     legend: { position: "bottom" },
   };
-  const polarSeries = [88, 82, 90, 85, 87];
+  const polarSeries = [4.8, 4.6, 4.4, 4.2, 4.7];
 
   const handleTimeRangeChange = (value) => {
     setTimeRange(value);
-    router.push(`/teacher?timeRange=${value}`);
+    router.push(`/parent?timeRange=${value}`);
   };
 
   return (
@@ -575,15 +522,9 @@ export default function Home() {
       {/* Header Section */}
       <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
         <Col>
-          <ElegantLogo>
-            <LogoIcon>
-              <GraduationCap size={24} color="#ffffff" />
-            </LogoIcon>
-            <LogoText>Dirassati</LogoText>
-          </ElegantLogo>
-          <StyledHeader>Teacher Dashboard</StyledHeader>
+          <StyledHeader>Parent Dashboard</StyledHeader>
           <p style={{ color: "#666", fontSize: "1.1rem", margin: 0 }}>
-            Welcome back, {teacherData.name}! Here's your teaching overview.
+            Welcome back! Here's what's happening with your children.
           </p>
         </Col>
         <Col>
@@ -607,32 +548,32 @@ export default function Home() {
       {/* Quick Actions */}
       <QuickActionGrid>
         <QuickActionCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-          <TrophyOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Grade Assignments</h3>
-          <p>Review and grade student work</p>
+          <MessageOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>Send Message</h3>
+          <p>Contact teachers instantly</p>
         </QuickActionCard>
         <QuickActionCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
-          <BookOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Class Management</h3>
-          <p>Manage your classes and students</p>
+          <CalendarOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>Schedule Meeting</h3>
+          <p>Book parent-teacher conference</p>
         </QuickActionCard>
         <QuickActionCard gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
-          <UserOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Student Progress</h3>
-          <p>Track individual student performance</p>
+          <BookOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>View Assignments</h3>
+          <p>Check homework and projects</p>
         </QuickActionCard>
         <QuickActionCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-          <CalendarOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Schedule Classes</h3>
-          <p>Plan and organize your lessons</p>
+          <TrophyOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>View Report Card</h3>
+          <p>Latest grades and progress</p>
         </QuickActionCard>
       </QuickActionGrid>
 
       {/* Key Metrics */}
       <StyledSection>
         <StyledSubHeader>
-          <TrophyOutlined /> Teaching Overview
-          <Tooltip title="Key performance indicators for your classes">
+          <TrophyOutlined /> Key Metrics
+          <Tooltip title="Important performance indicators for your children">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
@@ -708,84 +649,98 @@ export default function Home() {
         ))}
       </StyledSection>
 
-      {/* Teacher Profile */}
+      {/* Children Overview */}
       <StyledSection>
         <StyledSubHeader>
-          <UserOutlined /> Teacher Profile
+          <UserOutlined /> My Children
         </StyledSubHeader>
         <Row gutter={[24, 24]}>
-          <Col xs={24} lg={12}>
-            <ActivityCard>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  marginBottom: "16px",
-                }}
-              >
-                <Avatar
-                  size={64}
+          {childrenData.map((child) => (
+            <Col xs={24} lg={12} key={child.name}>
+              <ActivityCard>
+                <div
                   style={{
-                    background: "#667eea",
-                    fontSize: "24px",
-                    fontWeight: "600",
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "16px",
                   }}
                 >
-                  {teacherData.avatar}
-                </Avatar>
-                <div style={{ marginLeft: "16px" }}>
-                  <h3
+                  <Avatar
+                    size={64}
                     style={{
-                      margin: 0,
-                      fontSize: "1.3rem",
+                      background: "#667eea",
+                      fontSize: "24px",
                       fontWeight: "600",
                     }}
                   >
-                    {teacherData.name}
-                  </h3>
-                  <p style={{ margin: "4px 0", color: "#666" }}>
-                    {teacherData.role}
-                  </p>
-                  <div style={{ display: "flex", gap: "16px" }}>
-                    <span style={{ fontSize: "0.9rem" }}>
-                      <TrophyOutlined
-                        style={{ color: "#fa8c16", marginRight: "4px" }}
-                      />
-                      {teacherData.experience} Experience
-                    </span>
-                    <span style={{ fontSize: "0.9rem" }}>
-                      <BookOutlined
-                        style={{ color: "#667eea", marginRight: "4px" }}
-                      />
-                      {teacherData.department}
-                    </span>
+                    {child.avatar}
+                  </Avatar>
+                  <div style={{ marginLeft: "16px" }}>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1.3rem",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {child.name}
+                    </h3>
+                    <p style={{ margin: "4px 0", color: "#666" }}>
+                      {child.grade}
+                    </p>
+                    <div style={{ display: "flex", gap: "16px" }}>
+                      <span style={{ fontSize: "0.9rem" }}>
+                        <CheckCircleOutlined
+                          style={{ color: "#52c41a", marginRight: "4px" }}
+                        />
+                        {child.attendance}% Attendance
+                      </span>
+                      <span style={{ fontSize: "0.9rem" }}>
+                        <TrophyOutlined
+                          style={{ color: "#fa8c16", marginRight: "4px" }}
+                        />
+                        {child.averageGrade}% Average
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div
-                style={{
-                  padding: "12px",
-                  background: "#f8f9ff",
-                  borderRadius: "8px",
-                }}
-              >
-                <ClockCircleOutlined
-                  style={{ color: "#667eea", marginRight: "8px" }}
-                />
-                <span style={{ fontWeight: "500" }}>
-                  Next: {teacherData.nextClass}
-                </span>
-              </div>
-            </ActivityCard>
-          </Col>
+                <div style={{ marginBottom: "16px" }}>
+                  <h4 style={{ marginBottom: "8px" }}>Current Subjects:</h4>
+                  <div
+                    style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                  >
+                    {child.subjects.map((subject) => (
+                      <Tag key={subject} color="blue">
+                        {subject}
+                      </Tag>
+                    ))}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    padding: "12px",
+                    background: "#f8f9ff",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <ClockCircleOutlined
+                    style={{ color: "#667eea", marginRight: "8px" }}
+                  />
+                  <span style={{ fontWeight: "500" }}>
+                    Next: {child.nextClass}
+                  </span>
+                </div>
+              </ActivityCard>
+            </Col>
+          ))}
         </Row>
       </StyledSection>
 
       {/* Performance Trends */}
       <StyledSection>
         <StyledSubHeader>
-          <TrophyOutlined /> Class Performance Trends
-          <Tooltip title="Track class performance and attendance over time">
+          <TrophyOutlined /> Academic Performance Trends
+          <Tooltip title="Track your children's academic progress over time">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
@@ -802,8 +757,8 @@ export default function Home() {
       {/* Detailed Analytics */}
       <StyledSection>
         <StyledSubHeader>
-          <BookOutlined /> Subject Analytics
-          <Tooltip title="Subject performance and assignment analysis">
+          <BookOutlined /> Detailed Analytics
+          <Tooltip title="In-depth analysis of academic performance and attendance">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
@@ -833,7 +788,7 @@ export default function Home() {
                 color: "#333",
               }}
             >
-              Assignment Status
+              Attendance Breakdown
             </h3>
             <Chart
               options={donutOptions}
@@ -879,11 +834,11 @@ export default function Home() {
         </ActivityCard>
       </StyledSection>
 
-      {/* Class Engagement and Teaching Metrics */}
+      {/* Activity Heatmap and Satisfaction */}
       <StyledSection>
         <StyledSubHeader>
-          <StarOutlined /> Class Engagement & Teaching Metrics
-          <Tooltip title="Daily class engagement and teaching performance">
+          <StarOutlined /> Activity & Satisfaction
+          <Tooltip title="Weekly activity patterns and satisfaction ratings">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
@@ -891,7 +846,7 @@ export default function Home() {
           <CircularCard>
             <div style={{ textAlign: "center" }}>
               <h3 style={{ marginBottom: "16px", color: "#333" }}>
-                Class Engagement Heatmap
+                Weekly Activity Heatmap
               </h3>
               <Chart
                 options={heatmapOptions}
@@ -905,7 +860,7 @@ export default function Home() {
           <CircularCard>
             <div style={{ textAlign: "center" }}>
               <h3 style={{ marginBottom: "16px", color: "#333" }}>
-                Teaching Metrics
+                School Satisfaction
               </h3>
               <Chart
                 options={polarOptions}

@@ -15,6 +15,254 @@ import { Input } from "@/components/ui/input";
 import { MessageSquare, Send, Loader2 } from "lucide-react";
 import { useSelector } from "react-redux";
 import apiCall from "@/components/utils/apiCall";
+import styled from "styled-components";
+import { GraduationCap } from "lucide-react";
+
+// Enhanced styled components matching the main page design
+const StyledContainer = styled.div`
+  padding: 24px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+`;
+
+const StyledHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+`;
+
+const ElegantLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+`;
+
+const LogoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+  }
+`;
+
+const LogoText = styled.span`
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+  }
+`;
+
+const PageTitle = styled.h1`
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+`;
+
+const PageSubtitle = styled.p`
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+`;
+
+const EnhancedCard = styled(Card)`
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const TeacherCard = styled.div`
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #e8e8e8;
+  transition: all 0.3s ease;
+  cursor: pointer;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: rgba(102, 126, 234, 0.3);
+  }
+`;
+
+const ChatContainer = styled.div`
+  height: 500px;
+  overflow-y: auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+`;
+
+const MessageBubble = styled.div`
+  display: flex;
+  margin-bottom: 16px;
+  align-items: flex-end;
+
+  &.parent {
+    justify-content: flex-end;
+  }
+
+  &.teacher {
+    justify-content: flex-start;
+  }
+`;
+
+const MessageContent = styled.div`
+  max-width: 70%;
+  padding: 12px 16px;
+  border-radius: 16px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.4;
+
+  &.parent {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    margin-left: 12px;
+  }
+
+  &.teacher {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    color: #333;
+    margin-right: 12px;
+    border: 1px solid #e8e8e8;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    border: 6px solid transparent;
+
+    ${(props) =>
+      props.sender === "parent"
+        ? `
+      right: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-left-color: #667eea;
+      border-right: none;
+    `
+        : `
+      left: -6px;
+      top: 50%;
+      transform: translateY(-50%);
+      border-right-color: #ffffff;
+      border-left: none;
+    `}
+  }
+`;
+
+const AvatarCircle = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  flex-shrink: 0;
+
+  &.parent {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  &.teacher {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+  }
+`;
+
+const MessageInputContainer = styled.div`
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  margin-top: 16px;
+`;
+
+const EnhancedInput = styled(Input)`
+  border-radius: 12px;
+  border: 1px solid #e8e8e8;
+  background: #ffffff;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+`;
+
+const SendButton = styled(Button)`
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  }
+
+  &:disabled {
+    background: #ccc;
+    transform: none;
+    box-shadow: none;
+  }
+`;
 export default function ParentTeacherChat({ user }) {
   const [selectedChild, setSelectedChild] = useState("s1"); // Default: Amina
   const [selectedTeacher, setSelectedTeacher] = useState("1"); // Default: Fatima Haddad
@@ -198,9 +446,14 @@ export default function ParentTeacherChat({ user }) {
   useEffect(() => {
     const fetchTeachers = async () => {
       try {
-        const response = await apiCall("get", "/api/chats/?page=1&per_page=10", null, {
-          token,
-        });
+        const response = await apiCall(
+          "get",
+          "/api/chats/?page=1&per_page=10",
+          null,
+          {
+            token,
+          }
+        );
         const teacherChats = response.chats.map((chat) => ({
           id: chat.id,
           teacher_id: chat.teacher_id,
@@ -213,9 +466,7 @@ export default function ParentTeacherChat({ user }) {
       }
     };
 
-   
-      fetchTeachers();
-    
+    fetchTeachers();
   }, []);
 
   // Send message
@@ -292,30 +543,34 @@ export default function ParentTeacherChat({ user }) {
   }
 
   return (
-    <div className="p-4 min-h-screen bg-gradient-to-b from-beige-100 to-slate-200">
+    <StyledContainer>
       <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <motion.h1
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="text-4xl font-bold text-slate-800"
-          >
-            Discussion avec les enseignants
-          </motion.h1>
-          {/* <Select value={selectedChild} onValueChange={setSelectedChild}>
-            <SelectTrigger className="w-48 border-slate-300 rounded-lg shadow-sm">
-              <SelectValue placeholder="Sélectionner l’élève" />
-            </SelectTrigger>
-            <SelectContent>
-              {students.map((student) => (
-                <SelectItem key={student.id} value={student.id}>
-                  {student.first_name} {student.last_name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select> */}
-        </div>
+        <StyledHeader>
+          <div>
+            <ElegantLogo>
+              <LogoIcon>
+                <GraduationCap size={24} color="#ffffff" />
+              </LogoIcon>
+              <LogoText>Dirassati</LogoText>
+            </ElegantLogo>
+            <PageTitle>Discussion avec les enseignants</PageTitle>
+            <PageSubtitle>
+              Communiquez facilement avec les professeurs de vos enfants
+            </PageSubtitle>
+          </div>
+        </StyledHeader>
+        {/* <Select value={selectedChild} onValueChange={setSelectedChild}>
+          <SelectTrigger className="w-48 border-slate-300 rounded-lg shadow-sm">
+            <SelectValue placeholder="Sélectionner l’élève" />
+          </SelectTrigger>
+          <SelectContent>
+            {students.map((student) => (
+              <SelectItem key={student.id} value={student.id}>
+                {student.first_name} {student.last_name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select> */}
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar: Teacher List */}
           <motion.div
@@ -493,6 +748,6 @@ export default function ParentTeacherChat({ user }) {
           </motion.div>
         </div>
       </div>
-    </div>
+    </StyledContainer>
   );
 }

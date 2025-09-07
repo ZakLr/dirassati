@@ -9,6 +9,10 @@ import {
   CalendarOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  BookOutlined,
+  CreditCardOutlined,
+  ExclamationCircleOutlined,
+  BookOpen,
 } from "@ant-design/icons";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -30,7 +34,6 @@ import {
   Settings,
   Group,
   Notebook,
-  BookOpen,
   GraduationCap,
 } from "lucide-react";
 import { debounce } from "lodash";
@@ -288,8 +291,8 @@ const StyledFooter = styled(Footer)`
   font-weight: 500;
 `;
 
-const DashboardLayout = ({ children }) => {
-  const parent = useSelector((state) => state.userinfo.userProfile);
+const DashboardLayout = ({ children, role = "parent" }) => {
+  const user = useSelector((state) => state.userinfo.userProfile);
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -322,45 +325,211 @@ const DashboardLayout = ({ children }) => {
     console.log("Notifications clicked");
   };
 
-  const menuItems = [
-    { key: "home", icon: <HomeOutlined />, label: "Home", href: "/parent" },
-    {
-      key: "sons",
-      icon: <TeamOutlined />,
-      label: "Sons",
-      href: "/parent/sons",
-    },
-    {
-      key: "chat",
-      icon: <TeamOutlined />,
-      label: "Chat",
-      href: "/parent/chat",
-    },
-    {
-      key: "schedule",
-      icon: <CalendarOutlined />,
-      label: "Sons Schedule",
-      href: "/parent/schedule",
-    },
-    {
-      key: "payments",
-      icon: <Notebook />,
-      label: "Payments",
-      href: "/parent/payments",
-    },
-    {
-      key: "profile",
-      icon: <User />,
-      label: "Profile",
-      href: "/parent/parentProfile/1",
-    },
-    {
-      key: "addchild",
-      icon: <UserOutlined />,
-      label: "Add Child",
-      href: "/parent/addchild",
-    },
-  ];
+  // Role-specific menu items
+  const getMenuItems = () => {
+    switch (role) {
+      case "admin":
+        return [
+          {
+            key: "home",
+            icon: <HomeOutlined />,
+            label: "Home",
+            href: "/admin",
+          },
+          {
+            key: "students",
+            icon: <TeamOutlined />,
+            label: "Students",
+            href: "/admin/students",
+          },
+          {
+            key: "unapproved",
+            icon: <ExclamationCircleOutlined />,
+            label: "Unapproved Students",
+            href: "/admin/unapproved",
+          },
+          {
+            key: "parents",
+            icon: <UserOutlined />,
+            label: "Parents",
+            href: "/admin/parents",
+          },
+          {
+            key: "teachers",
+            icon: <TeamOutlined />,
+            label: "Teachers",
+            href: "/admin/teachers",
+          },
+          {
+            key: "archive",
+            icon: <TeamOutlined />,
+            label: "Archive",
+            href: "/admin/archive",
+          },
+          {
+            key: "groups",
+            icon: <Group />,
+            label: "Groups",
+            href: "/admin/groups",
+          },
+          {
+            key: "modules",
+            icon: <BookOutlined />,
+            label: "Modules",
+            href: "/admin/modules",
+          },
+          {
+            key: "schedule",
+            icon: <CalendarOutlined />,
+            label: "Schedule",
+            href: "/admin/schedule",
+          },
+          {
+            key: "payments",
+            icon: <CreditCardOutlined />,
+            label: "Payments",
+            href: "/admin/payments",
+          },
+        ];
+      case "teacher":
+        return [
+          {
+            key: "home",
+            icon: <HomeOutlined />,
+            label: "Home",
+            href: "/teacher",
+          },
+          {
+            key: "chat-parents",
+            icon: <TeamOutlined />,
+            label: "Chat with Parents",
+            href: "/teacher/chatparent",
+          },
+          {
+            key: "chat-students",
+            icon: <TeamOutlined />,
+            label: "Chat with Students",
+            href: "/teacher/chatstudent",
+          },
+          {
+            key: "schedule",
+            icon: <CalendarOutlined />,
+            label: "Schedule & Attendance",
+            href: "/teacher/schedule",
+          },
+          {
+            key: "marks",
+            icon: <Notebook />,
+            label: "Add Marks",
+            href: "/teacher/marks",
+          },
+          {
+            key: "profile",
+            icon: <User />,
+            label: "Profile",
+            href: "/teacher/profile",
+          },
+        ];
+      case "student":
+        return [
+          {
+            key: "home",
+            icon: <HomeOutlined />,
+            label: "Home",
+            href: "/student",
+          },
+          {
+            key: "schedule",
+            icon: <CalendarOutlined />,
+            label: "Schedule",
+            href: "/student/schedule",
+          },
+          {
+            key: "profile",
+            icon: <User />,
+            label: "Profile",
+            href: "/student/profile",
+          },
+        ];
+      default: // parent
+        return [
+          {
+            key: "home",
+            icon: <HomeOutlined />,
+            label: "Home",
+            href: "/parent",
+          },
+          {
+            key: "sons",
+            icon: <TeamOutlined />,
+            label: "Sons",
+            href: "/parent/sons",
+          },
+          {
+            key: "chat",
+            icon: <TeamOutlined />,
+            label: "Chat",
+            href: "/parent/chat",
+          },
+          {
+            key: "schedule",
+            icon: <CalendarOutlined />,
+            label: "Sons Schedule",
+            href: "/parent/schedule",
+          },
+          {
+            key: "payments",
+            icon: <Notebook />,
+            label: "Payments",
+            href: "/parent/payments",
+          },
+          {
+            key: "profile",
+            icon: <User />,
+            label: "Profile",
+            href: "/parent/parentProfile/1",
+          },
+          {
+            key: "addchild",
+            icon: <UserOutlined />,
+            label: "Add Child",
+            href: "/parent/addchild",
+          },
+        ];
+    }
+  };
+
+  // Role-specific user display name
+  const getUserDisplayName = () => {
+    if (!user) return role.charAt(0).toUpperCase() + role.slice(1);
+
+    switch (role) {
+      case "admin":
+        return user.first_name || "Admin";
+      case "teacher":
+        return user.first_name || "Teacher";
+      case "student":
+        return user.first_name || "Student";
+      default: // parent
+        return user.first_name || "Parent";
+    }
+  };
+
+  // Role-specific search placeholder
+  const getSearchPlaceholder = () => {
+    switch (role) {
+      case "admin":
+        return "Search students, teachers, parents...";
+      case "teacher":
+        return "Search students, assignments...";
+      case "student":
+        return "Search assignments, grades...";
+      default: // parent
+        return "Search children, assignments...";
+    }
+  };
+
+  const menuItems = getMenuItems();
 
   const userMenuItems = [
     {
@@ -387,7 +556,7 @@ const DashboardLayout = ({ children }) => {
   ];
 
   const getSelectedKey = () => {
-    if (pathname === "/parent") return "home";
+    if (pathname === `/${role}`) return "home";
     return pathname.split("/").pop() || "home";
   };
 
@@ -447,7 +616,7 @@ const DashboardLayout = ({ children }) => {
                       setSearchQuery(e.target.value);
                       handleSearch(e.target.value);
                     }}
-                    placeholder="Search students, groups..."
+                    placeholder={getSearchPlaceholder()}
                   />
                 </SearchContainer>
               ) : (
@@ -481,7 +650,7 @@ const DashboardLayout = ({ children }) => {
                       </AvatarFallback>
                     </Avatar>
                     <span className="hidden sm:inline text-sm font-medium">
-                      {parent.first_name}
+                      {getUserDisplayName()}
                     </span>
                   </UserMenuButton>
                 </DropdownMenuTrigger>

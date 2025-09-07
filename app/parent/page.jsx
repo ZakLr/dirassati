@@ -1,8 +1,8 @@
 "use client";
 
-import { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useSelector,useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { setUserProfile } from "../redux/features/userinfoSlice";
 import {
   Card as AntCard,
@@ -14,17 +14,32 @@ import {
   Space,
   Tooltip,
   Tabs,
+  Avatar,
+  List,
+  Progress,
+  Badge,
+  Tag,
 } from "antd";
 import {
   FilterOutlined,
   ZoomInOutlined,
   DownloadOutlined,
   InfoCircleOutlined,
+  UserOutlined,
+  BookOutlined,
+  TrophyOutlined,
+  CalendarOutlined,
+  BellOutlined,
+  MessageOutlined,
+  StarOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import dynamic from "next/dynamic";
 import { Card as ShadcnCard } from "@/components/ui/card";
 import styled from "styled-components";
-import apiCall from "@/components/utils/apiCall";
+import { GraduationCap } from "lucide-react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -34,16 +49,70 @@ const StyledSection = styled.div`
 `;
 
 const StyledHeader = styled.h1`
-  font-size: 2rem;
-  font-weight: 600;
+  font-size: 2.5rem;
+  font-weight: 700;
   margin-bottom: 24px;
   color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+`;
+
+const ElegantLogo = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+`;
+
+const LogoIcon = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.4);
+  }
+`;
+
+const LogoText = styled.span`
+  font-size: 2.2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  font-family: "Inter", "Segoe UI", sans-serif;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+    border-radius: 2px;
+    opacity: 0.8;
+  }
 `;
 
 const StyledSubHeader = styled.h2`
-  font-size: 1.25rem;
-  font-weight: 500;
-  margin-bottom: 16px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
   color: #333;
   display: flex;
   align-items: center;
@@ -51,36 +120,59 @@ const StyledSubHeader = styled.h2`
 `;
 
 const HeroChart = styled(ShadcnCard)`
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  background: linear-gradient(135deg, #ffffff, #f0faff);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  padding: 32px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
 `;
 
-const OverlapStat = styled(AntCard)`
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  width: 200px;
-  border-radius: 8px;
+const MetricCard = styled(AntCard)`
+  border-radius: 16px;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+`;
+
+const ActivityCard = styled(ShadcnCard)`
+  border-radius: 12px;
+  padding: 20px;
   background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 10;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
 `;
 
 const MasonryGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
-  grid-auto-rows: minmax(200px, auto);
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  grid-auto-rows: minmax(250px, auto);
   grid-auto-flow: dense;
 `;
 
 const MasonryItem = styled(ShadcnCard)`
-  border-radius: 10px;
-  padding: 16px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  }
+
   &:nth-child(odd) {
     grid-row: span 2;
   }
@@ -90,32 +182,66 @@ const CircularCluster = styled.div`
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
+  gap: 32px;
   position: relative;
 `;
 
 const CircularCard = styled(ShadcnCard)`
   border-radius: 50%;
-  width: 350px;
-  height: 350px;
-  padding: 20px;
-  background: linear-gradient(45deg, #fafafa, #ffffff);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 380px;
+  height: 380px;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.8);
 `;
 
-const SidePanel = styled(ShadcnCard)`
-  width: 300px;
-  height: 600px;
+const AnnouncementCard = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
   border-radius: 12px;
-  padding: 16px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  position: fixed;
-  right: 16px;
-  top: 100px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+`;
+
+const QuickActionGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+`;
+
+const QuickActionCard = styled.div`
+  background: ${(props) =>
+    props.gradient || "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"};
+  color: white;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+  }
 `;
 
 export default function Home() {
@@ -124,96 +250,158 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState(
     searchParams.get("timeRange") || "monthly"
   );
-  const [statsData, setStatsData] = useState(null);
-  const [loadingStats, setLoadingStats] = useState(true);
-  const [statsError, setStatsError] = useState(null);
-  const dispatch = useDispatch();
-  
-  
-  const authToken = useSelector((state) => state.auth.accessToken);
-   const parentinfo = useSelector((state)=>state.userinfo.userProfile) 
 
-  useEffect(() => {
-    
-    const fetchStats = async () => {
-      setLoadingStats(true);
-      setStatsError(null);
-      
+  // Enhanced dummy data for portfolio showcase
+  const statsData = [
+    {
+      name: "My Children",
+      value: 2,
+      change: "+1 this year",
+      color: "#667eea",
+      info: "Children enrolled in the school",
+      icon: <UserOutlined />,
+    },
+    {
+      name: "Average Grade",
+      value: 92.5,
+      suffix: "%",
+      color: "#764ba2",
+      info: "Combined average across all subjects",
+      icon: <TrophyOutlined />,
+    },
+    {
+      name: "Attendance Rate",
+      value: 96.8,
+      suffix: "%",
+      color: "#f093fb",
+      info: "Overall attendance this term",
+      icon: <CheckCircleOutlined />,
+    },
+    {
+      name: "Upcoming Events",
+      value: 5,
+      change: "This week",
+      color: "#4facfe",
+      info: "School events and activities",
+      icon: <CalendarOutlined />,
+    },
+  ];
 
-      
-      try {
-      const response = await apiCall("get", "/api/parents/me", null, {
-        token: authToken,
-      });
+  const announcements = [
+    {
+      id: 1,
+      title: "Parent-Teacher Conference",
+      message: "Scheduled for next Friday, 2:00 PM - 6:00 PM",
+      type: "important",
+      date: "2024-01-15",
+    },
+    {
+      id: 2,
+      title: "School Holiday Notice",
+      message: "Winter break starts December 20th and ends January 5th",
+      type: "info",
+      date: "2024-01-10",
+    },
+    {
+      id: 3,
+      title: "New Online Portal Features",
+      message: "Check out the new messaging system and grade tracking features",
+      type: "update",
+      date: "2024-01-08",
+    },
+  ];
 
-         dispatch(setUserProfile(response.parent))
-      
-        const stats = [
-          {
-            name: "Total Students",
-            value: res.total_students || 0,
-            change: res.students_change || "",
-            color: "#1890ff",
-            info: "Total enrolled students this term",
-          },
-          {
-            name: "Total Parents",
-            value: res.total_parents || 0,
-            change: res.parents_change || "",
-            color: "#52c41a",
-            info: "Active parent accounts linked",
-          },
-          {
-            name: "Active Sessions",
-            value: res.active_sessions || 0,
-            change: res.sessions_change || "",
-            color: "#fa8c16",
-            info: "Classes currently in progress",
-          },
-          {
-            name: "Attendance Rate",
-            value: res.attendance_rate || 0,
-            suffix: "%",
-            color: "#722ed1",
-            info: "Average daily attendance",
-          },
-        ];
-        setStatsData(stats);
-      } catch (error) {
-      console.log(error.message);
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-    }
-  
-    
-    fetchStats();
-  }, [authToken]);
+  const childrenData = [
+    {
+      name: "Sarah Johnson",
+      grade: "10th Grade",
+      avatar: "SJ",
+      attendance: 98,
+      averageGrade: 94.2,
+      subjects: ["Math A", "English A+", "Science A", "History B+"],
+      nextClass: "Mathematics - 2:00 PM",
+    },
+    {
+      name: "Michael Johnson",
+      grade: "7th Grade",
+      avatar: "MJ",
+      attendance: 95,
+      averageGrade: 90.8,
+      subjects: ["Math B+", "English A", "Science B", "Art A"],
+      nextClass: "Science Lab - 10:30 AM",
+    },
+  ];
+
+  const recentActivities = [
+    {
+      id: 1,
+      type: "grade",
+      title: "Sarah received A+ in Mathematics",
+      time: "2 hours ago",
+      icon: <TrophyOutlined />,
+      color: "#52c41a",
+    },
+    {
+      id: 2,
+      type: "attendance",
+      title: "Michael marked present for Science class",
+      time: "4 hours ago",
+      icon: <CheckCircleOutlined />,
+      color: "#1890ff",
+    },
+    {
+      id: 3,
+      type: "message",
+      title: "New message from Teacher Johnson",
+      time: "1 day ago",
+      icon: <MessageOutlined />,
+      color: "#fa8c16",
+    },
+    {
+      id: 4,
+      type: "event",
+      title: "School play rehearsal scheduled",
+      time: "2 days ago",
+      icon: <CalendarOutlined />,
+      color: "#722ed1",
+    },
+  ];
 
   const getAreaSeries = () => {
     switch (timeRange) {
       case "daily":
         return [
-          { name: "Students", data: [50, 52, 53, 55, 56, 57] },
-          { name: "Sessions", data: [2, 3, 3, 4, 4, 5] },
+          { name: "Sarah's Performance", data: [88, 92, 90, 94, 96, 93, 95] },
+          { name: "Michael's Performance", data: [85, 87, 89, 88, 91, 90, 92] },
+          { name: "Class Average", data: [82, 84, 86, 85, 87, 89, 88] },
         ];
       case "weekly":
         return [
-          { name: "Students", data: [300, 310, 320, 330, 340, 350] },
-          { name: "Sessions", data: [10, 12, 15, 17, 18, 20] },
+          { name: "Sarah's Performance", data: [89, 91, 93, 92, 94, 96, 95] },
+          { name: "Michael's Performance", data: [86, 88, 87, 90, 89, 91, 93] },
+          { name: "Class Average", data: [83, 85, 84, 86, 88, 87, 89] },
         ];
       default:
         return [
-          { name: "Students", data: [1100, 1120, 1150, 1200, 1220, 1250] },
-          { name: "Sessions", data: [30, 35, 40, 45, 48, 50] },
+          {
+            name: "Sarah's Performance",
+            data: [85, 87, 89, 91, 93, 90, 92, 94, 96, 95, 97, 94],
+          },
+          {
+            name: "Michael's Performance",
+            data: [82, 84, 86, 85, 87, 89, 88, 90, 92, 91, 93, 90],
+          },
+          {
+            name: "Class Average",
+            data: [80, 82, 81, 83, 85, 84, 86, 88, 87, 89, 87, 88],
+          },
         ];
     }
   };
 
   const areaOptions = {
     chart: {
-      id: "enrollment-trends",
+      id: "performance-trends",
       toolbar: {
         show: true,
         tools: { download: true, zoom: true, pan: true, reset: true },
@@ -223,35 +411,60 @@ export default function Home() {
     xaxis: {
       categories:
         timeRange === "daily"
-          ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
-          : ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          ? ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+          : timeRange === "weekly"
+          ? [
+              "Week 1",
+              "Week 2",
+              "Week 3",
+              "Week 4",
+              "Week 5",
+              "Week 6",
+              "Week 7",
+            ]
+          : [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
     },
-    colors: ["#1890ff", "#52c41a"],
+    colors: ["#667eea", "#764ba2", "#f093fb"],
     fill: {
       type: "gradient",
       gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.3 },
     },
-    stroke: { curve: "smooth", width: 2 },
+    stroke: { curve: "smooth", width: 3 },
     dataLabels: { enabled: false },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val}` } },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val}%` } },
     grid: { borderColor: "#e8e8e8", strokeDashArray: 4 },
     legend: { position: "top", horizontalAlign: "left", fontSize: "14px" },
-    markers: { size: 4, strokeWidth: 2, strokeColors: "#fff" },
+    markers: { size: 5, strokeWidth: 2, strokeColors: "#fff" },
   };
   const areaSeries = getAreaSeries();
 
   const barOptions = {
     chart: {
-      id: "grade-distribution",
+      id: "subject-performance",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
-    xaxis: { categories: ["9th", "10th", "11th", "12th"] },
-    colors: ["#1890ff"],
+    xaxis: {
+      categories: ["Mathematics", "English", "Science", "History", "Art", "PE"],
+    },
+    colors: ["#667eea"],
     plotOptions: {
       bar: {
-        borderRadius: 6,
-        columnWidth: "50%",
+        borderRadius: 8,
+        columnWidth: "60%",
         dataLabels: { position: "top" },
       },
     },
@@ -260,165 +473,116 @@ export default function Home() {
       offsetY: -20,
       style: { fontSize: "12px", colors: ["#304758"] },
     },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val} students` } },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val}%` } },
     grid: { borderColor: "#e8e8e8" },
   };
-  const barSeries = [{ name: "Students", data: [300, 400, 350, 250] }];
+  const barSeries = [{ name: "Average Grade", data: [94, 92, 89, 91, 96, 88] }];
 
   const donutOptions = {
     chart: {
-      id: "attendance",
+      id: "attendance-breakdown",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
-    labels: ["Present", "Late", "Absent"],
-    colors: ["#52c41a", "#fa8c16", "#f5222d"],
+    labels: ["Present", "Late", "Absent", "Excused"],
+    colors: ["#52c41a", "#fa8c16", "#f5222d", "#1890ff"],
     dataLabels: { enabled: true, formatter: (val) => `${val.toFixed(1)}%` },
     legend: { position: "bottom", fontSize: "14px" },
     plotOptions: {
       pie: {
         donut: {
-          size: "65%",
-          labels: { show: true, total: { show: true, label: "Total" } },
+          size: "70%",
+          labels: { show: true, total: { show: true, label: "Total Days" } },
         },
       },
     },
-    responsive: [
-      {
-        breakpoint: 480,
-        options: { chart: { width: 300 }, legend: { position: "bottom" } },
-      },
-    ],
   };
-  const donutSeries = [88, 7, 5];
+  const donutSeries = [89.2, 7.3, 2.1, 1.4];
 
   const heatmapOptions = {
     chart: {
-      id: "session-heatmap",
+      id: "weekly-activity",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
     dataLabels: { enabled: true, style: { colors: ["#fff"] } },
-    colors: ["#1890ff"],
+    colors: ["#667eea"],
     plotOptions: {
       heatmap: {
         shadeIntensity: 0.5,
         colorScale: {
           ranges: [
-            { from: 0, to: 20, color: "#e6f7ff" },
-            { from: 21, to: 50, color: "#1890ff" },
+            { from: 0, to: 3, color: "#e6f7ff" },
+            { from: 4, to: 7, color: "#bae7ff" },
+            { from: 8, to: 10, color: "#667eea" },
           ],
         },
       },
     },
     xaxis: { categories: ["Mon", "Tue", "Wed", "Thu", "Fri"] },
-    yaxis: { categories: ["9 AM", "10 AM", "11 AM", "12 PM"] },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val} sessions` } },
+    yaxis: {
+      categories: ["8 AM", "9 AM", "10 AM", "11 AM", "12 PM", "1 PM", "2 PM"],
+    },
+    tooltip: { theme: "light", y: { formatter: (val) => `${val} activities` } },
   };
   const heatmapSeries = [
-    { name: "9 AM", data: [20, 25, 30, 28, 22] },
-    { name: "10 AM", data: [35, 40, 45, 42, 38] },
-    { name: "11 AM", data: [15, 20, 25, 22, 18] },
-    { name: "12 PM", data: [10, 15, 20, 18, 12] },
-  ];
-
-  const stackedAreaOptions = {
-    chart: {
-      id: "demographics",
-      toolbar: { show: true, tools: { download: true } },
-      animations: { enabled: true },
-      stacked: true,
-    },
-    xaxis: { categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] },
-    colors: ["#1890ff", "#52c41a", "#fa8c16"],
-    fill: { opacity: 0.8 },
-    stroke: { width: 1 },
-    dataLabels: { enabled: false },
-    tooltip: { theme: "light", y: { formatter: (val) => `${val} students` } },
-    grid: { borderColor: "#e8e8e8" },
-    legend: { position: "top" },
-  };
-  const stackedAreaSeries = [
-    { name: "Male", data: [500, 510, 520, 530, 540, 550] },
-    { name: "Female", data: [600, 610, 620, 630, 640, 650] },
-    { name: "Other", data: [50, 52, 54, 56, 58, 60] },
-  ];
-
-  const candlestickOptions = {
-    chart: {
-      id: "grade-fluctuations",
-      toolbar: { show: true, tools: { download: true } },
-      animations: { enabled: true },
-    },
-    xaxis: { categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"] },
-    colors: ["#1890ff", "#f5222d"],
-    tooltip: { theme: "light" },
-    grid: { borderColor: "#e8e8e8" },
-  };
-  const candlestickSeries = [
-    {
-      data: [
-        { x: "Jan", y: [80, 85, 78, 82] },
-        { x: "Feb", y: [82, 87, 80, 84] },
-        { x: "Mar", y: [84, 88, 81, 86] },
-        { x: "Apr", y: [86, 90, 83, 88] },
-        { x: "May", y: [88, 92, 85, 90] },
-        { x: "Jun", y: [90, 94, 87, 92] },
-      ],
-    },
-  ];
-
-  const treemapOptions = {
-    chart: {
-      id: "resource-allocation",
-      toolbar: { show: true, tools: { download: true } },
-      animations: { enabled: true },
-    },
-    colors: ["#1890ff", "#52c41a", "#fa8c16", "#722ed1"],
-    dataLabels: { enabled: true, style: { fontSize: "12px" } },
-    tooltip: { theme: "light", y: { formatter: (val) => `$${val}k` } },
-  };
-  const treemapSeries = [
-    {
-      data: [
-        { x: "Academics", y: 500 },
-        { x: "Sports", y: 300 },
-        { x: "Arts", y: 200 },
-        { x: "Facilities", y: 150 },
-      ],
-    },
+    { name: "8 AM", data: [2, 3, 4, 3, 2] },
+    { name: "9 AM", data: [4, 5, 6, 5, 4] },
+    { name: "10 AM", data: [6, 7, 8, 7, 6] },
+    { name: "11 AM", data: [5, 6, 7, 6, 5] },
+    { name: "12 PM", data: [3, 4, 5, 4, 3] },
+    { name: "1 PM", data: [4, 5, 6, 5, 4] },
+    { name: "2 PM", data: [2, 3, 4, 3, 2] },
   ];
 
   const polarOptions = {
     chart: {
-      id: "feedback-ratings",
+      id: "subject-satisfaction",
       toolbar: { show: true, tools: { download: true } },
       animations: { enabled: true },
     },
-    labels: ["Communication", "Support", "Resources", "Events"],
-    colors: ["#1890ff", "#52c41a", "#fa8c16", "#722ed1"],
+    labels: [
+      "Teaching Quality",
+      "Resources",
+      "Communication",
+      "Facilities",
+      "Activities",
+    ],
+    colors: ["#667eea", "#764ba2", "#f093fb", "#4facfe", "#00f2fe"],
     fill: { opacity: 0.8 },
-    stroke: { width: 1 },
+    stroke: { width: 2 },
     dataLabels: { enabled: true },
     tooltip: { theme: "light", y: { formatter: (val) => `${val}/5` } },
     legend: { position: "bottom" },
   };
-  const polarSeries = [4.5, 4.2, 3.8, 4.0];
+  const polarSeries = [4.8, 4.6, 4.4, 4.2, 4.7];
 
   const handleTimeRangeChange = (value) => {
     setTimeRange(value);
-    router.push(`/admin_test?timeRange=${value}`);
+    router.push(`/parent?timeRange=${value}`);
   };
-     if (authToken === null){
-    router.push("/signin");
-   }
-   else{
 
   return (
-    <div style={{ padding: "0 16px" }}>
-      <Row justify="space-between" align="middle" style={{ marginBottom: 24 }}>
+    <div
+      style={{
+        padding: "24px",
+        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+        minHeight: "100vh",
+      }}
+    >
+      {/* Header Section */}
+      <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
         <Col>
-          <StyledHeader>School Dashboard</StyledHeader>
+          <ElegantLogo>
+            <LogoIcon>
+              <GraduationCap size={24} color="#ffffff" />
+            </LogoIcon>
+            <LogoText>Dirassati</LogoText>
+          </ElegantLogo>
+          <StyledHeader>Parent Dashboard</StyledHeader>
+          <p style={{ color: "#666", fontSize: "1.1rem", margin: 0 }}>
+            Welcome back! Here's what's happening with your children.
+          </p>
         </Col>
         <Col>
           <Space size="middle">
@@ -433,68 +597,207 @@ export default function Home() {
               style={{ width: 120 }}
             />
             <Button icon={<FilterOutlined />}>Filters</Button>
-            <Button icon={<ZoomInOutlined />}>Zoom</Button>
-            <Button type="primary" icon={<DownloadOutlined />}>
-              Export
-            </Button>
+            <Button icon={<DownloadOutlined />}>Export Report</Button>
           </Space>
         </Col>
       </Row>
 
-      {/* Hero Section: Area Chart with Overlapping Stat */}
+      {/* Quick Actions */}
+      <QuickActionGrid>
+        <QuickActionCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+          <MessageOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>Send Message</h3>
+          <p>Contact teachers instantly</p>
+        </QuickActionCard>
+        <QuickActionCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+          <CalendarOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>Schedule Meeting</h3>
+          <p>Book parent-teacher conference</p>
+        </QuickActionCard>
+        <QuickActionCard gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
+          <BookOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>View Assignments</h3>
+          <p>Check homework and projects</p>
+        </QuickActionCard>
+        <QuickActionCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+          <TrophyOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+          <h3>View Report Card</h3>
+          <p>Latest grades and progress</p>
+        </QuickActionCard>
+      </QuickActionGrid>
+
+      {/* Key Metrics */}
       <StyledSection>
         <StyledSubHeader>
-          Key Metrics
-          <Tooltip title="Core school performance indicators">
+          <TrophyOutlined /> Key Metrics
+          <Tooltip title="Important performance indicators for your children">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
-        <Row gutter={[16, 16]}>
-          {loadingStats ? (
-            <Col span={24} style={{ textAlign: "center" }}>
-              <span>Loading metrics...</span>
+        <Row gutter={[24, 24]}>
+          {statsData.map((stat) => (
+            <Col xs={24} sm={12} lg={6} key={stat.name}>
+              <MetricCard hoverable>
+                <Statistic
+                  title={
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "8px",
+                      }}
+                    >
+                      {stat.icon}
+                      {stat.name}
+                      <Tooltip title={stat.info}>
+                        <InfoCircleOutlined
+                          style={{ fontSize: "12px", color: "#888" }}
+                        />
+                      </Tooltip>
+                    </span>
+                  }
+                  value={stat.value}
+                  suffix={stat.suffix || stat.change}
+                  valueStyle={{
+                    color: stat.color,
+                    fontSize: "32px",
+                    fontWeight: 700,
+                  }}
+                />
+              </MetricCard>
             </Col>
-          ) : statsError ? (
-            <Col span={24} style={{ textAlign: "center", color: "red" }}>
-              {statsError}
-            </Col>
-          ) : (
-            statsData && statsData.map((stat) => (
-              <Col xs={24} sm={12} md={6} key={stat.name}>
-                <AntCard
-                  hoverable
-                  style={{ borderRadius: 8, border: "1px solid #e8e8e8" }}
-                >
-                  <Statistic
-                    title={
-                      <span>
-                        {stat.name}{" "}
-                        <Tooltip title={stat.info}>
-                          <InfoCircleOutlined
-                            style={{ fontSize: "12px", color: "#888" }}
-                          />
-                        </Tooltip>
-                      </span>
-                    }
-                    value={stat.value}
-                    suffix={stat.suffix || stat.change}
-                    valueStyle={{
-                      color: stat.color,
-                      fontSize: "24px",
-                      fontWeight: 500,
-                    }}
-                  />
-                </AntCard>
-              </Col>
-            ))
-          )}
+          ))}
         </Row>
       </StyledSection>
 
+      {/* Announcements */}
       <StyledSection>
         <StyledSubHeader>
-          Enrollment Trends
-          <Tooltip title="Track student and session growth">
+          <BellOutlined /> Important Announcements
+        </StyledSubHeader>
+        {announcements.map((announcement) => (
+          <AnnouncementCard key={announcement.id}>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "8px",
+              }}
+            >
+              <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "600" }}>
+                {announcement.title}
+              </h3>
+              <Tag
+                color={
+                  announcement.type === "important"
+                    ? "red"
+                    : announcement.type === "info"
+                    ? "blue"
+                    : "green"
+                }
+              >
+                {announcement.type}
+              </Tag>
+            </div>
+            <p style={{ margin: 0, opacity: 0.9 }}>{announcement.message}</p>
+            <small style={{ opacity: 0.7 }}>{announcement.date}</small>
+          </AnnouncementCard>
+        ))}
+      </StyledSection>
+
+      {/* Children Overview */}
+      <StyledSection>
+        <StyledSubHeader>
+          <UserOutlined /> My Children
+        </StyledSubHeader>
+        <Row gutter={[24, 24]}>
+          {childrenData.map((child) => (
+            <Col xs={24} lg={12} key={child.name}>
+              <ActivityCard>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginBottom: "16px",
+                  }}
+                >
+                  <Avatar
+                    size={64}
+                    style={{
+                      background: "#667eea",
+                      fontSize: "24px",
+                      fontWeight: "600",
+                    }}
+                  >
+                    {child.avatar}
+                  </Avatar>
+                  <div style={{ marginLeft: "16px" }}>
+                    <h3
+                      style={{
+                        margin: 0,
+                        fontSize: "1.3rem",
+                        fontWeight: "600",
+                      }}
+                    >
+                      {child.name}
+                    </h3>
+                    <p style={{ margin: "4px 0", color: "#666" }}>
+                      {child.grade}
+                    </p>
+                    <div style={{ display: "flex", gap: "16px" }}>
+                      <span style={{ fontSize: "0.9rem" }}>
+                        <CheckCircleOutlined
+                          style={{ color: "#52c41a", marginRight: "4px" }}
+                        />
+                        {child.attendance}% Attendance
+                      </span>
+                      <span style={{ fontSize: "0.9rem" }}>
+                        <TrophyOutlined
+                          style={{ color: "#fa8c16", marginRight: "4px" }}
+                        />
+                        {child.averageGrade}% Average
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ marginBottom: "16px" }}>
+                  <h4 style={{ marginBottom: "8px" }}>Current Subjects:</h4>
+                  <div
+                    style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                  >
+                    {child.subjects.map((subject) => (
+                      <Tag key={subject} color="blue">
+                        {subject}
+                      </Tag>
+                    ))}
+                  </div>
+                </div>
+                <div
+                  style={{
+                    padding: "12px",
+                    background: "#f8f9ff",
+                    borderRadius: "8px",
+                  }}
+                >
+                  <ClockCircleOutlined
+                    style={{ color: "#667eea", marginRight: "8px" }}
+                  />
+                  <span style={{ fontWeight: "500" }}>
+                    Next: {child.nextClass}
+                  </span>
+                </div>
+              </ActivityCard>
+            </Col>
+          ))}
+        </Row>
+      </StyledSection>
+
+      {/* Performance Trends */}
+      <StyledSection>
+        <StyledSubHeader>
+          <TrophyOutlined /> Academic Performance Trends
+          <Tooltip title="Track your children's academic progress over time">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
@@ -503,151 +806,130 @@ export default function Home() {
             options={areaOptions}
             series={areaSeries}
             type="area"
-            height={400}
+            height={450}
           />
-          {/* <OverlapStat>
-            <Statistic
-              title="Growth Rate"
-              value={5.2}
-              suffix="%"
-              valueStyle={{ color: "#52c41a", fontSize: "20px" }}
-            />
-          </OverlapStat> */}
         </HeroChart>
       </StyledSection>
 
-      {/* Masonry Grid: Bar and Donut */}
+      {/* Detailed Analytics */}
       <StyledSection>
         <StyledSubHeader>
-          Student Insights
-          <Tooltip title="Grade and attendance analysis">
+          <BookOutlined /> Detailed Analytics
+          <Tooltip title="In-depth analysis of academic performance and attendance">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
         <MasonryGrid>
           <MasonryItem>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: 12 }}>
-              Grade Distribution
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                marginBottom: "16px",
+                color: "#333",
+              }}
+            >
+              Subject Performance
             </h3>
             <Chart
               options={barOptions}
               series={barSeries}
               type="bar"
-              height={300}
+              height={320}
             />
           </MasonryItem>
           <MasonryItem>
-            <h3 style={{ fontSize: "1.1rem", marginBottom: 12 }}>
+            <h3
+              style={{
+                fontSize: "1.3rem",
+                marginBottom: "16px",
+                color: "#333",
+              }}
+            >
               Attendance Breakdown
             </h3>
             <Chart
               options={donutOptions}
               series={donutSeries}
               type="donut"
-              height={250}
+              height={280}
             />
           </MasonryItem>
         </MasonryGrid>
       </StyledSection>
 
-      {/* Tabbed Carousel: Stacked Area and Candlestick */}
+      {/* Recent Activities */}
       <StyledSection>
         <StyledSubHeader>
-          Performance Trends
-          <Tooltip title="Demographics and grades over time">
-            <InfoCircleOutlined style={{ color: "#888" }} />
-          </Tooltip>
+          <ClockCircleOutlined /> Recent Activities
         </StyledSubHeader>
-        <Tabs
-          defaultActiveKey="1"
-          items={[
-            {
-              key: "1",
-              label: "Demographics",
-              children: (
-                <ShadcnCard
-                  style={{
-                    borderRadius: 8,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    padding: "16px",
-                  }}
-                >
-                  <Chart
-                    options={stackedAreaOptions}
-                    series={stackedAreaSeries}
-                    type="area"
-                    height={300}
-                  />
-                </ShadcnCard>
-              ),
-            },
-            {
-              key: "2",
-              label: "Grade Fluctuations",
-              children: (
-                <ShadcnCard
-                  style={{
-                    borderRadius: 8,
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-                    padding: "16px",
-                  }}
-                >
-                  <Chart
-                    options={candlestickOptions}
-                    series={candlestickSeries}
-                    type="candlestick"
-                    height={300}
-                  />
-                </ShadcnCard>
-              ),
-            },
-          ]}
-        />
+        <ActivityCard>
+          <List
+            dataSource={recentActivities}
+            renderItem={(item) => (
+              <List.Item
+                style={{ padding: "16px 0", borderBottom: "1px solid #f0f0f0" }}
+              >
+                <List.Item.Meta
+                  avatar={
+                    <Avatar
+                      icon={item.icon}
+                      style={{ background: item.color }}
+                    />
+                  }
+                  title={
+                    <span style={{ fontWeight: "500" }}>{item.title}</span>
+                  }
+                  description={
+                    <span style={{ color: "#666", fontSize: "0.9rem" }}>
+                      {item.time}
+                    </span>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        </ActivityCard>
       </StyledSection>
 
-      {/* Circular Cluster: Heatmap and Polar Area */}
+      {/* Activity Heatmap and Satisfaction */}
       <StyledSection>
         <StyledSubHeader>
-          Activity & Feedback
-          <Tooltip title="Session activity and parent feedback">
+          <StarOutlined /> Activity & Satisfaction
+          <Tooltip title="Weekly activity patterns and satisfaction ratings">
             <InfoCircleOutlined style={{ color: "#888" }} />
           </Tooltip>
         </StyledSubHeader>
         <CircularCluster>
           <CircularCard>
-            <Chart
-              options={heatmapOptions}
-              series={heatmapSeries}
-              type="heatmap"
-              height={300}
-              width={300}
-            />
+            <div style={{ textAlign: "center" }}>
+              <h3 style={{ marginBottom: "16px", color: "#333" }}>
+                Weekly Activity Heatmap
+              </h3>
+              <Chart
+                options={heatmapOptions}
+                series={heatmapSeries}
+                type="heatmap"
+                height={280}
+                width={280}
+              />
+            </div>
           </CircularCard>
           <CircularCard>
-            <Chart
-              options={polarOptions}
-              series={polarSeries}
-              type="polarArea"
-              height={300}
-              width={300}
-            />
+            <div style={{ textAlign: "center" }}>
+              <h3 style={{ marginBottom: "16px", color: "#333" }}>
+                School Satisfaction
+              </h3>
+              <Chart
+                options={polarOptions}
+                series={polarSeries}
+                type="polarArea"
+                height={280}
+                width={280}
+              />
+            </div>
           </CircularCard>
         </CircularCluster>
       </StyledSection>
-
-      {/* Side Panel: Treemap */}
-      {/* <SidePanel>
-        <h3 style={{ fontSize: "1.1rem", marginBottom: 12 }}>
-          Resource Allocation
-        </h3>
-        <Chart
-          options={treemapOptions}
-          series={treemapSeries}
-          type="treemap"
-          height={550}
-        />
-      </SidePanel> */}
     </div>
   );
-}
 }

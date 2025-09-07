@@ -1,74 +1,314 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# School Management System
 
-## Getting Started
+A comprehensive web-based school management system built with Next.js, designed to streamline educational administration and enhance communication between administrators, teachers, parents, and students.
 
-First, run the development server:
+## 🚀 Features
+
+### 🔐 Authentication & User Management
+
+- **Multi-role Authentication**: Support for Admin, Teacher, Parent, and Student roles
+- **Secure Login System**: JWT-based authentication with token refresh
+- **Role-based Access Control**: Different permissions and features for each user type
+- **Password Reset**: Secure password recovery with OTP verification
+- **Profile Management**: User profile customization and management
+
+### 👨‍💼 Admin Dashboard
+
+- **Real-time Analytics**: Comprehensive dashboard with key metrics and statistics
+- **Student Management**:
+  - View and manage approved students
+  - Edit student information (level, group assignments)
+  - Approve/unapprove students
+  - Send notifications to individual students
+  - View student documents and PDFs
+- **Schedule Management**:
+  - Create and manage academic schedules
+  - Auto-generate schedules based on availability
+  - Assign teachers, modules, and rooms to time slots
+  - Support for multiple trimesters and academic levels
+- **Group Management**: Create and manage student groups
+- **Module Management**: Assign modules to different academic levels
+- **Archive System**: Manage archived data and records
+
+### 👨‍🏫 Teacher Dashboard
+
+- **Personal Dashboard**: Overview of classes and statistics
+- **Schedule Management**: View and manage teaching schedules
+- **Student Management**: Access to assigned students and groups
+- **Communication Tools**: Chat with parents and students
+- **Grade Management**: Add and update student marks (planned feature)
+- **Attendance Tracking**: Monitor student attendance
+
+### 👨‍👩‍👧‍👦 Parent Dashboard
+
+- **Family Overview**: Manage multiple children in the system
+- **Child Registration**: Complete child registration process
+- **Schedule Access**: View children's academic schedules
+- **Communication**: Chat with teachers
+- **Payment Management**: Handle school fees and payments (planned feature)
+- **Progress Tracking**: Monitor children's academic performance
+
+### 👨‍🎓 Student Dashboard
+
+- **Personal Dashboard**: Academic overview and statistics
+- **Schedule View**: Access to personal academic schedule
+- **Attendance Tracking**: View personal attendance records
+- **Grade Visualization**: View marks and academic performance
+- **Communication**: Chat with teachers and classmates (planned features)
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+- **Next.js 15.2.1**: React framework for production
+- **React 19.0.0**: UI library
+- **Tailwind CSS**: Utility-first CSS framework
+- **Ant Design**: UI component library
+- **Redux Toolkit**: State management
+- **Redux Persist**: State persistence
+- **React Hook Form**: Form handling
+- **Framer Motion**: Animations
+- **ApexCharts**: Data visualization
+- **Recharts**: Additional charting library
+
+### Backend Integration
+
+- **RESTful APIs**: Communication with backend services
+- **Axios**: HTTP client for API calls
+- **JWT**: Authentication tokens
+- **Cloudinary**: File storage and management
+
+### Development Tools
+
+- **TypeScript**: Type safety (configured)
+- **ESLint**: Code linting
+- **PostCSS**: CSS processing
+- **Autoprefixer**: CSS vendor prefixing
+
+## 📁 Project Structure
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+├── app/                          # Next.js app directory
+│   ├── (auth)/                   # Authentication routes
+│   ├── admin/                    # Admin dashboard
+│   │   ├── components/           # Admin-specific components
+│   │   ├── schedule/             # Schedule management
+│   │   ├── students/             # Student management
+│   │   └── ...
+│   ├── parent/                   # Parent dashboard
+│   ├── student/                  # Student dashboard
+│   ├── teacher/                  # Teacher dashboard
+│   ├── signin/                   # Sign-in page
+│   ├── signup/                   # Registration pages
+│   ├── api/                      # API routes
+│   ├── redux/                    # State management
+│   └── globals.css               # Global styles
+├── components/                   # Shared components
+│   ├── ui/                       # UI components
+│   └── utils/                    # Utility functions
+├── lib/                          # Library configurations
+├── public/                       # Static assets
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Prerequisites
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Node.js 18.x or higher
+- npm, yarn, or pnpm
+- Git
 
-## Learn More
+### Installation
 
-To learn more about Next.js, take a look at the following resources:
+1. **Clone the repository**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+   ```bash
+   git clone https://github.com/1CS-Project-Dirassati/Frontend.git
+   cd Frontend
+   ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+2. **Install dependencies**
 
-## Deploy on Vercel
+   ```bash
+   npm install
+   # or
+   yarn install
+   # or
+   pnpm install
+   ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```env
+   NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+   NEXT_PUBLIC_CLOUDINARY_API_KEY=your_api_key
+   NEXT_PUBLIC_CLOUDINARY_API_SECRET=your_api_secret
+   NEXT_PUBLIC_API_BASE_URL=your_backend_api_url
+   ```
 
+4. **Run the development server**
 
-## Admin_test Structure
-this url contains pages to be used later on in each actor's separate pages
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   # or
+   pnpm dev
+   ```
 
-#### Actor's folder structure
-- Admin:
-    general stats
-    parents table
-    students table
-    approve students
-    timetable manager
-    groups manager
-    profile section
+5. **Open your browser**
+   Navigate to [http://localhost:3000](http://localhost:3000)
 
-- Parent:
-    general stats
-    sons' detailed table
-    chat with teacher (to be done later)
-    son's schedule page
-    payments (to be done later)
+## 📊 Key Features Breakdown
 
-- Student:
-    general stats
-    schedule
-    marks visualizer (to be done)
-    chat with teacher (to be done)
-    chat with students (to be done later)
+### Admin Features
 
-- Teacher:
-    general stats
-    shedule
-    add marks (to be done later)
-    chat with students
-    chat with parents
+- **Dashboard Analytics**:
 
+  - Total students, parents, active sessions
+  - Attendance rates and enrollment trends
+  - Grade distribution and performance metrics
+  - Resource allocation visualization
 
+- **Student Management**:
 
+  - Comprehensive student database
+  - Level and group assignments
+  - Document management (PDF viewing)
+  - Notification system
+
+- **Schedule Creation**:
+  - Multi-step schedule creation wizard
+  - Auto-generation based on availability
+  - Conflict detection and resolution
+  - Support for multiple academic levels
+
+### Parent Features
+
+- **Multi-Child Support**: Manage multiple children
+- **Registration Process**: Step-by-step child registration
+- **Schedule Access**: View children's timetables
+- **Communication Portal**: Direct messaging with teachers
+
+### Student Features
+
+- **Academic Dashboard**: Personal performance metrics
+- **Schedule Viewer**: Daily/weekly schedule display
+- **Attendance Records**: Personal attendance history
+- **Document Access**: View personal documents
+
+### Teacher Features
+
+- **Class Management**: Assigned groups and students
+- **Schedule Overview**: Teaching schedule management
+- **Communication Tools**: Parent and student messaging
+
+## 🔧 Available Scripts
+
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run start    # Start production server
+npm run lint     # Run ESLint
+```
+
+## 🎨 UI/UX Features
+
+- **Responsive Design**: Mobile-first approach with Tailwind CSS
+- **Dark/Light Theme**: Theme switching capability
+- **Modern UI Components**: Ant Design + custom Shadcn/ui components
+- **Interactive Charts**: ApexCharts and Recharts integration
+- **Smooth Animations**: Framer Motion animations
+- **Toast Notifications**: Real-time feedback with Sonner
+
+## 🔒 Security Features
+
+- **JWT Authentication**: Secure token-based authentication
+- **Role-based Access**: Different permissions per user type
+- **Token Refresh**: Automatic token renewal
+- **Secure API Calls**: Protected API endpoints
+- **File Upload Security**: Cloudinary integration for secure file handling
+
+## 📱 Responsive Design
+
+The application is fully responsive and optimized for:
+
+- Desktop computers
+- Tablets
+- Mobile devices
+- Different screen sizes and orientations
+
+## 🌐 Browser Support
+
+- Chrome (recommended)
+- Firefox
+- Safari
+- Edge
+- Mobile browsers (iOS Safari, Chrome Mobile)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Support
+
+For support, please contact the development team or create an issue in the repository.
+
+## 🚀 Deployment
+
+The application can be deployed on:
+
+- Vercel (recommended for Next.js)
+- Netlify
+- AWS
+- Digital Ocean
+- Any Node.js hosting platform
+
+### Deployment Steps
+
+1. Build the application:
+
+   ```bash
+   npm run build
+   ```
+
+2. Start the production server:
+
+   ```bash
+   npm run start
+   ```
+
+## 📈 Future Enhancements
+
+### Planned Features
+
+- **Real-time Chat**: Integrated messaging system
+- **Grade Management**: Teacher grading interface
+- **Payment Integration**: Stripe payment processing
+- **Mobile App**: React Native companion app
+- **Advanced Analytics**: Machine learning insights
+- **Multi-language Support**: Internationalization
+- **Offline Mode**: Progressive Web App features
+
+### Technical Improvements
+
+- **TypeScript Migration**: Full TypeScript support
+- **Testing Suite**: Comprehensive test coverage
+- **Performance Optimization**: Code splitting and lazy loading
+- **API Caching**: Redis integration for better performance
+
+---
+
+## ❤️ Built with Love
+
+Built with ❤️ for educational excellence

@@ -36,6 +36,104 @@ export default function Parents() {
   const token = useSelector((state) => state.auth.accessToken);
   const router = useRouter();
 
+  // Dummy data for parents
+  const dummyParents = [
+    {
+      id: 1,
+      first_name: "Mohammed",
+      last_name: "Ben Ali",
+      email: "mohammed.benali@example.com",
+      phone_number: "+212 6 11 22 33 44",
+      address: "123 Family Street, Casablanca",
+    },
+    {
+      id: 2,
+      first_name: "Fatima",
+      last_name: "El Amrani",
+      email: "fatima.elamrani@example.com",
+      phone_number: "+212 6 22 33 44 55",
+      address: "456 Parent Avenue, Rabat",
+    },
+    {
+      id: 3,
+      first_name: "Ahmed",
+      last_name: "Tazi",
+      email: "ahmed.tazi@example.com",
+      phone_number: "+212 6 33 44 55 66",
+      address: "789 Guardian Boulevard, Marrakech",
+    },
+    {
+      id: 4,
+      first_name: "Amina",
+      last_name: "Bouazza",
+      email: "amina.bouazza@example.com",
+      phone_number: "+212 6 44 55 66 77",
+      address: "321 Caretaker Street, Fes",
+    },
+    {
+      id: 5,
+      first_name: "Hassan",
+      last_name: "Alaoui",
+      email: "hassan.alaoui@example.com",
+      phone_number: "+212 6 55 66 77 88",
+      address: "654 Supervisor Lane, Tangier",
+    },
+    {
+      id: 6,
+      first_name: "Zahra",
+      last_name: "Benkirane",
+      email: "zahra.benkirane@example.com",
+      phone_number: "+212 6 66 77 88 99",
+      address: "987 Mentor Road, Agadir",
+    },
+  ];
+
+  // Dummy data for students (children)
+  const dummyStudents = [
+    {
+      id: 1,
+      first_name: "Ahmed",
+      last_name: "Ben Ali",
+      parent_id: 1,
+    },
+    {
+      id: 2,
+      first_name: "Fatima",
+      last_name: "Ben Ali",
+      parent_id: 1,
+    },
+    {
+      id: 3,
+      first_name: "Youssef",
+      last_name: "El Amrani",
+      parent_id: 2,
+    },
+    {
+      id: 4,
+      first_name: "Sara",
+      last_name: "Tazi",
+      parent_id: 3,
+    },
+    {
+      id: 5,
+      first_name: "Omar",
+      last_name: "Bouazza",
+      parent_id: 4,
+    },
+    {
+      id: 6,
+      first_name: "Leila",
+      last_name: "Alaoui",
+      parent_id: 5,
+    },
+    {
+      id: 7,
+      first_name: "Karim",
+      last_name: "Benkirane",
+      parent_id: 6,
+    },
+  ];
+
   const fetchParents = async (page = currentPage, perPage = pageSize) => {
     setLoading(true);
     try {
@@ -49,8 +147,13 @@ export default function Parents() {
       setTotalParents(response.total || response.count || 0);
       setError(null);
     } catch (err) {
-      setError("Failed to fetch parents");
-      message.error("Failed to fetch parents");
+      // Use dummy data as fallback
+      message.warning("Failed to fetch parents - Using demo data");
+      const startIndex = (page - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      setData(dummyParents.slice(startIndex, endIndex));
+      setTotalParents(dummyParents.length);
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -70,8 +173,8 @@ export default function Parents() {
       );
       return response.students || response.results || [];
     } catch (err) {
-      message.error("Failed to fetch students");
-      return [];
+      // Use dummy data as fallback
+      return dummyStudents.filter((student) => student.parent_id === parentId);
     }
   };
 

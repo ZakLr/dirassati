@@ -30,6 +30,104 @@ export default function Teachers() {
   const [modules, setModules] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  // Dummy data for teachers
+  const dummyTeachers = [
+    {
+      id: 1,
+      first_name: "Dr. Fatima",
+      last_name: "El Amrani",
+      email: "fatima.elamrani@school.edu",
+      phone_number: "+212 6 12 34 56 78",
+      address: "123 Education Street, Casablanca",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Fatima",
+      modules: [
+        { id: 1, name: "Mathematics" },
+        { id: 2, name: "Physics" },
+      ],
+    },
+    {
+      id: 2,
+      first_name: "Prof. Ahmed",
+      last_name: "Ben Salah",
+      email: "ahmed.bensalah@school.edu",
+      phone_number: "+212 6 23 45 67 89",
+      address: "456 Knowledge Avenue, Rabat",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed",
+      modules: [
+        { id: 3, name: "Chemistry" },
+        { id: 4, name: "Biology" },
+      ],
+    },
+    {
+      id: 3,
+      first_name: "Ms. Leila",
+      last_name: "Tazi",
+      email: "leila.tazi@school.edu",
+      phone_number: "+212 6 34 56 78 90",
+      address: "789 Learning Boulevard, Marrakech",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Leila",
+      modules: [
+        { id: 5, name: "English Literature" },
+        { id: 6, name: "French" },
+      ],
+    },
+    {
+      id: 4,
+      first_name: "Mr. Omar",
+      last_name: "Alaoui",
+      email: "omar.alaoui@school.edu",
+      phone_number: "+212 6 45 67 89 01",
+      address: "321 Wisdom Street, Fes",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Omar",
+      modules: [
+        { id: 7, name: "History" },
+        { id: 8, name: "Geography" },
+      ],
+    },
+    {
+      id: 5,
+      first_name: "Dr. Nadia",
+      last_name: "Bouazza",
+      email: "nadia.bouazza@school.edu",
+      phone_number: "+212 6 56 78 90 12",
+      address: "654 Scholar Lane, Tangier",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nadia",
+      modules: [
+        { id: 9, name: "Computer Science" },
+        { id: 10, name: "Information Technology" },
+      ],
+    },
+    {
+      id: 6,
+      first_name: "Prof. Hassan",
+      last_name: "El Fassi",
+      email: "hassan.elfassi@school.edu",
+      phone_number: "+212 6 67 89 01 23",
+      address: "987 Academic Road, Agadir",
+      profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Hassan",
+      modules: [
+        { id: 11, name: "Arabic Language" },
+        { id: 12, name: "Islamic Studies" },
+      ],
+    },
+  ];
+
+  // Dummy data for modules
+  const dummyModules = [
+    { id: 1, name: "Mathematics" },
+    { id: 2, name: "Physics" },
+    { id: 3, name: "Chemistry" },
+    { id: 4, name: "Biology" },
+    { id: 5, name: "English Literature" },
+    { id: 6, name: "French" },
+    { id: 7, name: "History" },
+    { id: 8, name: "Geography" },
+    { id: 9, name: "Computer Science" },
+    { id: 10, name: "Information Technology" },
+    { id: 11, name: "Arabic Language" },
+    { id: 12, name: "Islamic Studies" },
+  ];
+
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [totalTeachers, setTotalTeachers] = useState(0);
@@ -65,7 +163,11 @@ export default function Teachers() {
       setTeachers(enrichedTeachers);
       setTotalTeachers(res.total || res.count || 0);
     } catch {
-      message.error("Failed to load teachers");
+      // Use dummy data as fallback
+      const startIndex = (page - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      setTeachers(dummyTeachers.slice(startIndex, endIndex));
+      setTotalTeachers(dummyTeachers.length);
     } finally {
       setLoading(false);
     }
@@ -76,7 +178,7 @@ export default function Teachers() {
       const res = await apiCall("get", "/api/modules/", null, { token });
       setModules(res.modules || res.data || []);
     } catch {
-      message.error("Failed to load modules");
+      setModules(dummyModules);
     }
   };
 
@@ -84,6 +186,11 @@ export default function Teachers() {
     if (token) {
       fetchTeachers(currentPage, pageSize);
       fetchModules();
+    } else {
+      // Use dummy data when no token
+      setTeachers(dummyTeachers.slice(0, pageSize));
+      setModules(dummyModules);
+      setTotalTeachers(dummyTeachers.length);
     }
   }, [token, currentPage, pageSize]);
 
@@ -165,7 +272,6 @@ export default function Teachers() {
       message.error("Update failed");
     }
   };
-  
 
   const handleCreate = async () => {
     try {
@@ -220,7 +326,6 @@ export default function Teachers() {
       message.error("Failed to create teacher");
     }
   };
-  
 
   const columns = [
     { title: "ID", dataIndex: "id", key: "id" },
