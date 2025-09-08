@@ -1,16 +1,22 @@
-
+import { Geist, Geist_Mono } from "next/font/google";
 import ThemeProvider from "@/components/ui/ThemeProvider"; // Import ThemeProvider;
 
 import "./globals.css";
 import ReduxProvider from "./redux/ReduxProvider";
 import { Metadata } from "next";
+const geistSans = Geist({
+  variable: "--font-geist-sans",
+  subsets: ["latin"],
+});
 
-
-
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export const metadata = {
   title: "Dirassati",
-  description: "A platform for educational resources and management for private schools",
+  description: "Private school management platform",
 };
 
 export default function RootLayout({ children }) {
