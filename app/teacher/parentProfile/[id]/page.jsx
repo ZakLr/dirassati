@@ -1,13 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, use } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button as ShadcnButton } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { parentsData } from "../../data/parentsData";
 
 export default function ParentProfile({ params }) {
-  const { id } = params;
+  const { id } = use(params);
   const router = useRouter();
   const parent = parentsData.find((p) => p.key === id);
 

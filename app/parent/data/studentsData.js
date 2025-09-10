@@ -673,9 +673,9 @@ export let parents = [
   },
   {
     id: 14,
-    first_name: "Yacine",
+    first_name: "User",
     last_name: "Guerfi",
-    email: "yacine.guerfi@example.dz",
+    email: "User.guerfi@example.dz",
     is_email_verified: true,
     phone_number: "+213660123414",
     is_phone_verified: true,
@@ -824,7 +824,6 @@ export let schedules = [
   },
 ];
 
-
 export let attendance = {
   s1: {
     "2025-05-01": { status: "present", class_id: 101 },
@@ -923,17 +922,17 @@ export let classes = {
 
 // Return level object by ID
 export function getLevelById(id) {
-  return levels.find(l => l.id === id);
+  return levels.find((l) => l.id === id);
 }
 
 // Return group object by ID
 export function getGroupById(id) {
-  return groups.find(g => g.id === id);
+  return groups.find((g) => g.id === id);
 }
 
 // Get all groups for a given level_id
 export function getGroupsByLevelId(level_id) {
-  return groups.filter(g => g.level_id === level_id);
+  return groups.filter((g) => g.level_id === level_id);
 }
 
 // Sessions with groupId as key
@@ -945,7 +944,7 @@ export let sessions = [
     room: "101",
     groupId: 1, // 1A
     day: "الأحد",
-    time: "08:00"
+    time: "08:00",
   },
   {
     id: "sess-2",
@@ -954,15 +953,13 @@ export let sessions = [
     room: "102",
     groupId: 5, // 6A
     day: "الإثنين",
-    time: "09:00"
-  }
+    time: "09:00",
+  },
 ];
-
-
 
 // Get sessions for a specific group (e.g., 1A)
 export function getSessionsForGroup(groupId) {
-  return sessions.filter(s => s.groupId === groupId);
+  return sessions.filter((s) => s.groupId === groupId);
 }
 
 // Add session
@@ -1030,6 +1027,6 @@ export function getParentStudents(parent_id) {
   return students.filter((s) => s.parent_id === parent_id);
 }
 
-export function getGrades(){
+export function getGrades() {
   return grades;
 }

@@ -35,10 +35,10 @@ export default function Teachers() {
     {
       id: 1,
       first_name: "Dr. Fatima",
-      last_name: "El Amrani",
-      email: "fatima.elamrani@school.edu",
-      phone_number: "+212 6 12 34 56 78",
-      address: "123 Education Street, Casablanca",
+      last_name: "Ben Ali",
+      email: "fatima.benali@school.dz",
+      phone_number: "+213 5 51 23 45 67",
+      address: "123 Education Street, Algiers",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Fatima",
       modules: [
         { id: 1, name: "Mathematics" },
@@ -48,10 +48,10 @@ export default function Teachers() {
     {
       id: 2,
       first_name: "Prof. Ahmed",
-      last_name: "Ben Salah",
-      email: "ahmed.bensalah@school.edu",
-      phone_number: "+212 6 23 45 67 89",
-      address: "456 Knowledge Avenue, Rabat",
+      last_name: "Bouzid",
+      email: "ahmed.bouzid@school.dz",
+      phone_number: "+213 4 12 34 56 78",
+      address: "456 Knowledge Avenue, Oran",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmed",
       modules: [
         { id: 3, name: "Chemistry" },
@@ -61,10 +61,10 @@ export default function Teachers() {
     {
       id: 3,
       first_name: "Ms. Leila",
-      last_name: "Tazi",
-      email: "leila.tazi@school.edu",
-      phone_number: "+212 6 34 56 78 90",
-      address: "789 Learning Boulevard, Marrakech",
+      last_name: "Cherif",
+      email: "leila.cherif@school.dz",
+      phone_number: "+213 3 12 34 56 78",
+      address: "789 Learning Boulevard, Constantine",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Leila",
       modules: [
         { id: 5, name: "English Literature" },
@@ -74,10 +74,10 @@ export default function Teachers() {
     {
       id: 4,
       first_name: "Mr. Omar",
-      last_name: "Alaoui",
-      email: "omar.alaoui@school.edu",
-      phone_number: "+212 6 45 67 89 01",
-      address: "321 Wisdom Street, Fes",
+      last_name: "Hamdi",
+      email: "omar.hamdi@school.dz",
+      phone_number: "+213 7 89 01 23 45",
+      address: "321 Wisdom Street, Annaba",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Omar",
       modules: [
         { id: 7, name: "History" },
@@ -87,10 +87,10 @@ export default function Teachers() {
     {
       id: 5,
       first_name: "Dr. Nadia",
-      last_name: "Bouazza",
-      email: "nadia.bouazza@school.edu",
-      phone_number: "+212 6 56 78 90 12",
-      address: "654 Scholar Lane, Tangier",
+      last_name: "Kaci",
+      email: "nadia.kaci@school.dz",
+      phone_number: "+213 2 34 56 78 90",
+      address: "654 Scholar Lane, Blida",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Nadia",
       modules: [
         { id: 9, name: "Computer Science" },
@@ -100,10 +100,10 @@ export default function Teachers() {
     {
       id: 6,
       first_name: "Prof. Hassan",
-      last_name: "El Fassi",
-      email: "hassan.elfassi@school.edu",
-      phone_number: "+212 6 67 89 01 23",
-      address: "987 Academic Road, Agadir",
+      last_name: "Mansouri",
+      email: "hassan.mansouri@school.dz",
+      phone_number: "+213 6 78 90 12 34",
+      address: "987 Academic Road, Batna",
       profile_picture: "https://api.dicebear.com/7.x/avataaars/svg?seed=Hassan",
       modules: [
         { id: 11, name: "Arabic Language" },
@@ -413,12 +413,13 @@ export default function Teachers() {
             setIsCreateModalOpen(true);
             form.resetFields();
           }}
+          className="w-full sm:w-auto"
         >
           Add Teacher
         </Button>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto bg-white rounded-lg shadow">
         <Table
           columns={columns}
           dataSource={teachers}
@@ -436,6 +437,7 @@ export default function Teachers() {
             },
           }}
           scroll={{ x: 1000 }}
+          size={window.innerWidth < 768 ? "small" : "middle"}
         />
       </div>
 
@@ -446,22 +448,26 @@ export default function Teachers() {
         onOk={handleUpdate}
         title="Edit Teacher"
         okText="Update"
+        width={window.innerWidth < 768 ? "95%" : "600px"}
+        bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="first_name"
-            label="First Name"
-            rules={[{ required: true }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="last_name"
-            label="Last Name"
-            rules={[{ required: true }]}
-          >
-            <AntInput />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item
+              name="first_name"
+              label="First Name"
+              rules={[{ required: true }]}
+            >
+              <AntInput />
+            </Form.Item>
+            <Form.Item
+              name="last_name"
+              label="Last Name"
+              rules={[{ required: true }]}
+            >
+              <AntInput />
+            </Form.Item>
+          </div>
           <Form.Item
             name="email"
             label="Email"
@@ -469,12 +475,14 @@ export default function Teachers() {
           >
             <AntInput />
           </Form.Item>
-          <Form.Item name="phone_number" label="Phone Number">
-            <AntInput />
-          </Form.Item>
-          <Form.Item name="address" label="Address">
-            <AntInput />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item name="phone_number" label="Phone Number">
+              <AntInput />
+            </Form.Item>
+            <Form.Item name="address" label="Address">
+              <AntInput />
+            </Form.Item>
+          </div>
           <Form.Item name="profile_picture" label="Profile Picture URL">
             <AntInput />
           </Form.Item>
@@ -486,6 +494,7 @@ export default function Teachers() {
                 label: m.name,
                 value: m.id,
               }))}
+              className="w-full"
             />
           </Form.Item>
         </Form>
@@ -498,22 +507,26 @@ export default function Teachers() {
         onOk={handleCreate}
         title="Add New Teacher"
         okText="Create"
+        width={window.innerWidth < 768 ? "95%" : "600px"}
+        bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
       >
         <Form form={form} layout="vertical">
-          <Form.Item
-            name="first_name"
-            label="First Name"
-            rules={[{ required: true }]}
-          >
-            <AntInput />
-          </Form.Item>
-          <Form.Item
-            name="last_name"
-            label="Last Name"
-            rules={[{ required: true }]}
-          >
-            <AntInput />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item
+              name="first_name"
+              label="First Name"
+              rules={[{ required: true }]}
+            >
+              <AntInput />
+            </Form.Item>
+            <Form.Item
+              name="last_name"
+              label="Last Name"
+              rules={[{ required: true }]}
+            >
+              <AntInput />
+            </Form.Item>
+          </div>
           <Form.Item
             name="email"
             label="Email"
@@ -528,12 +541,14 @@ export default function Teachers() {
           >
             <AntInput.Password />
           </Form.Item>
-          <Form.Item name="phone_number" label="Phone Number">
-            <AntInput />
-          </Form.Item>
-          <Form.Item name="address" label="Address">
-            <AntInput />
-          </Form.Item>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Form.Item name="phone_number" label="Phone Number">
+              <AntInput />
+            </Form.Item>
+            <Form.Item name="address" label="Address">
+              <AntInput />
+            </Form.Item>
+          </div>
           <Form.Item
             name="profile_picture"
             label="Profile Picture URL"
@@ -549,6 +564,7 @@ export default function Teachers() {
                 label: m.name,
                 value: m.id,
               }))}
+              className="w-full"
             />
           </Form.Item>
         </Form>

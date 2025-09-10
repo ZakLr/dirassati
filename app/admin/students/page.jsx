@@ -1,13 +1,31 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Dropdown, Button, message } from "antd";
+import {
+  Table,
+  Dropdown,
+  Button,
+  message,
+  Input,
+  Space,
+  Tag,
+  Avatar,
+} from "antd";
 import {
   MoreOutlined,
   FilePdfOutlined,
   EyeOutlined,
   EditOutlined,
   BellOutlined,
+  SearchOutlined,
+  FilterOutlined,
+  DownloadOutlined,
+  UserOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  CalendarOutlined,
+  IdcardOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import {
   Dialog,
@@ -27,6 +45,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { useSelector } from "react-redux";
 import apiCall from "@/components/utils/apiCall";
 import { useRouter } from "next/navigation";
@@ -80,6 +100,9 @@ export default function ApprovedStudents() {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [editStudent, setEditStudent] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchText, setSearchText] = useState("");
+  const [selectedLevel, setSelectedLevel] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState("");
   const router = useRouter();
   const [pagination, setPagination] = useState({
     current: 1,
@@ -91,14 +114,26 @@ export default function ApprovedStudents() {
   const language = "fr";
   const t = translations[language];
 
+  // Helper functions to get level and group names
+  const getLevelName = (levelId) => {
+    const level = levels.find((l) => l.id === levelId);
+    return level ? level.name : "Unknown Level";
+  };
+
+  const getGroupName = (groupId) => {
+    if (!groupId) return "Unassigned";
+    const group = groups.find((g) => g.id === groupId);
+    return group ? group.name : "Unknown Group";
+  };
+
   // Dummy data for students
   const dummyStudents = [
     {
       id: 1,
       first_name: "Ahmed",
       last_name: "Ben Ali",
-      email: "ahmed.benali@example.com",
-      level_id: 1,
+      email: "ahmed.benali@school.dz",
+      level_id: 10, // 1st Year Secondary
       group_id: 1,
       date_of_birth: "2005-03-15",
       national_id: "123456789",
@@ -111,8 +146,8 @@ export default function ApprovedStudents() {
       id: 2,
       first_name: "Fatima",
       last_name: "Al-Zahra",
-      email: "fatima.alzahra@example.com",
-      level_id: 2,
+      email: "fatima.alzahra@school.dz",
+      level_id: 11, // 2nd Year Secondary
       group_id: 2,
       date_of_birth: "2004-07-22",
       national_id: "987654321",
@@ -125,8 +160,8 @@ export default function ApprovedStudents() {
       id: 3,
       first_name: "Mohammed",
       last_name: "El Hassan",
-      email: "mohammed.elhassan@example.com",
-      level_id: 1,
+      email: "mohammed.elhassan@school.dz",
+      level_id: 9, // 4th Year Middle
       group_id: 3,
       date_of_birth: "2006-01-10",
       national_id: "456789123",
@@ -139,8 +174,8 @@ export default function ApprovedStudents() {
       id: 4,
       first_name: "Amina",
       last_name: "Bouazza",
-      email: "amina.bouazza@example.com",
-      level_id: 3,
+      email: "amina.bouazza@school.dz",
+      level_id: 12, // 3rd Year Secondary
       group_id: 1,
       date_of_birth: "2003-11-05",
       national_id: "789123456",
@@ -153,8 +188,8 @@ export default function ApprovedStudents() {
       id: 5,
       first_name: "Youssef",
       last_name: "Tazi",
-      email: "youssef.tazi@example.com",
-      level_id: 2,
+      email: "youssef.tazi@school.dz",
+      level_id: 8, // 3rd Year Middle
       group_id: 2,
       date_of_birth: "2005-09-18",
       national_id: "321654987",
@@ -167,8 +202,8 @@ export default function ApprovedStudents() {
       id: 6,
       first_name: "Sara",
       last_name: "El Amrani",
-      email: "sara.elamrani@example.com",
-      level_id: 1,
+      email: "sara.elamrani@school.dz",
+      level_id: 7, // 2nd Year Middle
       group_id: 3,
       date_of_birth: "2006-04-30",
       national_id: "654987321",
@@ -181,8 +216,8 @@ export default function ApprovedStudents() {
       id: 7,
       first_name: "Omar",
       last_name: "Benjelloun",
-      email: "omar.benjelloun@example.com",
-      level_id: 3,
+      email: "omar.benjelloun@school.dz",
+      level_id: 6, // 1st Year Middle
       group_id: 1,
       date_of_birth: "2004-12-08",
       national_id: "147258369",
@@ -195,8 +230,8 @@ export default function ApprovedStudents() {
       id: 8,
       first_name: "Leila",
       last_name: "Mouline",
-      email: "leila.mouline@example.com",
-      level_id: 2,
+      email: "leila.mouline@school.dz",
+      level_id: 5, // 5th Year Primary
       group_id: 2,
       date_of_birth: "2005-06-14",
       national_id: "963852741",
@@ -207,19 +242,88 @@ export default function ApprovedStudents() {
     },
   ];
 
-  // Dummy data for levels
+  // Dummy data for levels (Algerian Education System)
   const dummyLevels = [
-    { id: 1, name: "Grade 9" },
-    { id: 2, name: "Grade 10" },
-    { id: 3, name: "Grade 11" },
-    { id: 4, name: "Grade 12" },
+    {
+      id: 1,
+      name: "السنة الأولى ابتدائي",
+      english: "1st Year Primary",
+      short: "1AP",
+    },
+    {
+      id: 2,
+      name: "السنة الثانية ابتدائي",
+      english: "2nd Year Primary",
+      short: "2AP",
+    },
+    {
+      id: 3,
+      name: "السنة الثالثة ابتدائي",
+      english: "3rd Year Primary",
+      short: "3AP",
+    },
+    {
+      id: 4,
+      name: "السنة الرابعة ابتدائي",
+      english: "4th Year Primary",
+      short: "4AP",
+    },
+    {
+      id: 5,
+      name: "السنة الخامسة ابتدائي",
+      english: "5th Year Primary",
+      short: "5AP",
+    },
+    {
+      id: 6,
+      name: "السنة السادسة متوسط",
+      english: "1st Year Middle",
+      short: "1AM",
+    },
+    {
+      id: 7,
+      name: "السنة السابعة متوسط",
+      english: "2nd Year Middle",
+      short: "2AM",
+    },
+    {
+      id: 8,
+      name: "السنة الثامنة متوسط",
+      english: "3rd Year Middle",
+      short: "3AM",
+    },
+    {
+      id: 9,
+      name: "السنة التاسعة متوسط",
+      english: "4th Year Middle",
+      short: "4AM",
+    },
+    {
+      id: 10,
+      name: "السنة الأولى ثانوي",
+      english: "1st Year Secondary",
+      short: "1AS",
+    },
+    {
+      id: 11,
+      name: "السنة الثانية ثانوي",
+      english: "2nd Year Secondary",
+      short: "2AS",
+    },
+    {
+      id: 12,
+      name: "السنة الثالثة ثانوي",
+      english: "3rd Year Secondary",
+      short: "3AS",
+    },
   ];
 
   // Dummy data for groups
   const dummyGroups = [
-    { id: 1, name: "Group A" },
-    { id: 2, name: "Group B" },
-    { id: 3, name: "Group C" },
+    { id: 1, name: "مجموعة العلوم الأساسية أ" },
+    { id: 2, name: "مجموعة اللغات ب" },
+    { id: 3, name: "مجموعة العلوم الإنسانية ج" },
+    { id: 4, name: "مجموعة التكنولوجيا د" },
   ];
 
   useEffect(() => {
@@ -304,9 +408,26 @@ export default function ApprovedStudents() {
     });
   };
 
-  const getLevelName = (id) => levels.find((l) => l.id === id)?.name || "—";
-  const getGroupName = (id) =>
-    groups.find((g) => g.id === id)?.name || t.unassigned;
+  const filteredStudents = students.filter((student) => {
+    const matchesSearch =
+      `${student.first_name} ${student.last_name}`
+        .toLowerCase()
+        .includes(searchText.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchText.toLowerCase());
+
+    const matchesLevel =
+      !selectedLevel || student.level_id.toString() === selectedLevel;
+    const matchesGroup =
+      !selectedGroup || student.group_id?.toString() === selectedGroup;
+
+    return matchesSearch && matchesLevel && matchesGroup;
+  });
+
+  const clearFilters = () => {
+    setSearchText("");
+    setSelectedLevel("");
+    setSelectedGroup("");
+  };
 
   const openPdf = (url) => {
     setPdfFile(
@@ -381,40 +502,40 @@ export default function ApprovedStudents() {
       {
         key: "view",
         label: (
-          <span>
-            <EyeOutlined className="mr-2" />
-            {t.view}
-          </span>
+          <div className="flex items-center gap-3 px-3 py-2 hover:bg-blue-50 rounded-md transition-colors">
+            <EyeOutlined className="text-blue-600" />
+            <span className="text-gray-700 font-medium">{t.view}</span>
+          </div>
         ),
         onClick: () => router.push(`/admin/studentProfile/${record.id}`),
       },
       {
         key: "edit",
         label: (
-          <span>
-            <EditOutlined className="mr-2" />
-            {t.edit}
-          </span>
+          <div className="flex items-center gap-3 px-3 py-2 hover:bg-green-50 rounded-md transition-colors">
+            <EditOutlined className="text-green-600" />
+            <span className="text-gray-700 font-medium">{t.edit}</span>
+          </div>
         ),
         onClick: () => openEdit(record),
       },
       {
         key: "docs",
         label: (
-          <span>
-            <FilePdfOutlined className="mr-2" />
-            {t.viewDocuments}
-          </span>
+          <div className="flex items-center gap-3 px-3 py-2 hover:bg-purple-50 rounded-md transition-colors">
+            <FilePdfOutlined className="text-purple-600" />
+            <span className="text-gray-700 font-medium">{t.viewDocuments}</span>
+          </div>
         ),
         onClick: () => openPdf(record.docs_url),
       },
       {
         key: "notify",
         label: (
-          <span>
-            <BellOutlined className="mr-2" />
-            {t.notify}
-          </span>
+          <div className="flex items-center gap-3 px-3 py-2 hover:bg-orange-50 rounded-md transition-colors">
+            <BellOutlined className="text-orange-600" />
+            <span className="text-gray-700 font-medium">{t.notify}</span>
+          </div>
         ),
         onClick: () => openNotify(record),
       },
@@ -423,181 +544,477 @@ export default function ApprovedStudents() {
 
   const columns = [
     {
-      title: "Nom",
-      key: "name",
-      render: (_, record) => `${record.first_name} ${record.last_name}`,
+      title: "Student",
+      key: "student",
+      render: (_, record) => (
+        <div className="flex items-center gap-3">
+          <Avatar size="small" icon={<UserOutlined />} />
+          <div>
+            <div className="font-medium text-gray-900">
+              {record.first_name} {record.last_name}
+            </div>
+            <div className="text-sm text-gray-500">{record.email}</div>
+          </div>
+        </div>
+      ),
+      sorter: (a, b) =>
+        `${a.first_name} ${a.last_name}`.localeCompare(
+          `${b.first_name} ${b.last_name}`
+        ),
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
+      title: "Level",
+      render: (_, record) => (
+        <Badge variant="outline" className="font-medium">
+          {getLevelName(record.level_id)}
+        </Badge>
+      ),
+      filters: levels.map((level) => ({
+        text: level.name,
+        value: level.id,
+      })),
+      onFilter: (value, record) => record.level_id === value,
     },
     {
-      title: "Niveau",
-      render: (_, record) => getLevelName(record.level_id),
+      title: "Group",
+      render: (_, record) => (
+        <Tag color="blue" className="font-medium">
+          {getGroupName(record.group_id)}
+        </Tag>
+      ),
+      filters: groups.map((group) => ({
+        text: group.name,
+        value: group.id,
+      })),
+      onFilter: (value, record) => record.group_id === value,
     },
     {
-      title: "Groupe",
-      render: (_, record) => getGroupName(record.group_id),
+      title: "Status",
+      render: (_, record) => (
+        <Badge className="bg-green-100 text-green-800 border-green-200">
+          Approved
+        </Badge>
+      ),
     },
     {
       title: "Actions",
+      key: "actions",
       render: (_, record) => (
-        <Dropdown menu={actionMenu(record)} trigger={["click"]}>
-          <Button icon={<MoreOutlined />} />
+        <Dropdown
+          menu={actionMenu(record)}
+          trigger={["click"]}
+          placement="bottomRight"
+          overlayClassName="shadow-lg rounded-lg"
+        >
+          <Button
+            type="text"
+            className="flex items-center gap-2 hover:bg-blue-50 rounded-lg px-3 py-2"
+          >
+            <MoreOutlined className="text-gray-600" />
+            <span className="text-gray-600">Actions</span>
+          </Button>
         </Dropdown>
       ),
+      width: 120,
     },
   ];
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-6">{t.title}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/30 p-6">
+      <div className="max-w-7xl mx-auto space-y-6">
+        {/* Header */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
+          <CardHeader>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              {t.title}
+            </CardTitle>
+            <p className="text-gray-600 mt-2">
+              Manage and monitor approved students in the system
+            </p>
+          </CardHeader>
+        </Card>
 
-      <Table
-        columns={columns}
-        dataSource={students.filter(
-          (s) => s.is_approved && s.is_active !== false
-        )}
-        rowKey="id"
-        bordered
-        loading={isLoading}
-        onChange={handleTableChange}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          showSizeChanger: true,
-          showTotal: (total) => `Total ${total} étudiants`,
-        }}
-      />
+        {/* Filters and Search */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-2xl">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  <SearchOutlined className="mr-2" />
+                  Search Students
+                </Label>
+                <Input
+                  placeholder="Search by name or email..."
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  prefix={<SearchOutlined />}
+                  className="rounded-lg"
+                />
+              </div>
 
-      {/* View Student Dialog */}
-      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.viewStudentTitle}</DialogTitle>
-          </DialogHeader>
-          {selectedStudent && (
-            <div className="space-y-2">
-              <p>
-                <strong>{t.firstName}:</strong> {selectedStudent.first_name}
-              </p>
-              <p>
-                <strong>{t.lastName}:</strong> {selectedStudent.last_name}
-              </p>
-              <p>
-                <strong>{t.email}:</strong> {selectedStudent.email}
-              </p>
-              <p>
-                <strong>{t.dob}:</strong> {selectedStudent.date_of_birth}
-              </p>
-              <p>
-                <strong>{t.nationalId}:</strong> {selectedStudent.national_id}
-              </p>
-              <p>
-                <strong>{t.gender}:</strong>{" "}
-                {selectedStudent.gender === "male" ? t.male : t.female}
-              </p>
-              <p>
-                <strong>{t.level}:</strong>{" "}
-                {getLevelName(selectedStudent.level_id)}
-              </p>
-              <p>
-                <strong>{t.group}:</strong>{" "}
-                {getGroupName(selectedStudent.group_id)}
-              </p>
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  <FilterOutlined className="mr-2" />
+                  Filter by Level
+                </Label>
+                <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="All Levels" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-levels">All Levels</SelectItem>
+                    {levels.map((level) => (
+                      <SelectItem key={level.id} value={level.id.toString()}>
+                        {level.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium text-gray-700">
+                  <TeamOutlined className="mr-2" />
+                  Filter by Group
+                </Label>
+                <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+                  <SelectTrigger className="rounded-lg">
+                    <SelectValue placeholder="All Groups" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all-groups">All Groups</SelectItem>
+                    {groups.map((group) => (
+                      <SelectItem key={group.id} value={group.id.toString()}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-end">
+                <Button
+                  onClick={clearFilters}
+                  className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 border-0 rounded-lg"
+                >
+                  Clear Filters
+                </Button>
+              </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
-      {/* Edit Student Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.editStudentTitle}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Label>{t.level}</Label>
-            <Select
-              value={editStudent?.level_id || ""}
-              onValueChange={(value) =>
-                setEditStudent((prev) => ({ ...prev, level_id: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir un niveau" />
-              </SelectTrigger>
-              <SelectContent>
-                {levels.map((level) => (
-                  <SelectItem key={level.id} value={String(level.id)}>
-                    {level.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {/* Filter Summary */}
+            {(searchText || selectedLevel || selectedGroup) && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {searchText && (
+                  <Tag color="blue" closable onClose={() => setSearchText("")}>
+                    Search: {searchText}
+                  </Tag>
+                )}
+                {selectedLevel && (
+                  <Tag
+                    color="green"
+                    closable
+                    onClose={() => setSelectedLevel("")}
+                  >
+                    Level:{" "}
+                    {
+                      levels.find((l) => l.id.toString() === selectedLevel)
+                        ?.name
+                    }
+                  </Tag>
+                )}
+                {selectedGroup && (
+                  <Tag
+                    color="purple"
+                    closable
+                    onClose={() => setSelectedGroup("")}
+                  >
+                    Group:{" "}
+                    {
+                      groups.find((g) => g.id.toString() === selectedGroup)
+                        ?.name
+                    }
+                  </Tag>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
 
-            <Label>{t.group}</Label>
-            <Select
-              value={editStudent?.group_id || "none"}
-              onValueChange={(value) =>
-                setEditStudent((prev) => ({ ...prev, group_id: value }))
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choisir un groupe" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="none">{t.unassigned}</SelectItem>
-                {groups.map((group) => (
-                  <SelectItem key={group.id} value={String(group.id)}>
-                    {group.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <DialogFooter>
-            <ShadcnButton onClick={handleEditStudent}>
-              {t.saveChanges}
-            </ShadcnButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* Table */}
+        <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-xl rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <Table
+                columns={columns}
+                dataSource={filteredStudents.filter(
+                  (s) => s.is_approved && s.is_active !== false
+                )}
+                rowKey="id"
+                bordered={false}
+                loading={isLoading}
+                onChange={handleTableChange}
+                pagination={{
+                  current: pagination.current,
+                  pageSize: pagination.pageSize,
+                  total: filteredStudents.length,
+                  showSizeChanger: true,
+                  showTotal: (total, range) =>
+                    `Showing ${range[0]}-${range[1]} of ${total} students`,
+                  className: "px-6 py-4",
+                }}
+                scroll={{ x: 1000 }}
+                size="middle"
+                className="custom-table"
+                rowClassName="hover:bg-blue-50/50 transition-colors duration-200"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* PDF Dialog */}
-      <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
-        <DialogContent className="w-full h-[80vh] max-w-5xl">
-          {pdfFile && (
-            <iframe
-              src={pdfFile}
-              className="w-full h-full"
-              frameBorder="0"
-              title="PDF Document"
-            ></iframe>
-          )}
-        </DialogContent>
-      </Dialog>
+        {/* View Student Dialog */}
+        <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <UserOutlined />
+                {t.viewStudentTitle}
+              </DialogTitle>
+            </DialogHeader>
+            {selectedStudent && (
+              <div className="space-y-6">
+                {/* Student Avatar and Basic Info */}
+                <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg">
+                  <Avatar size={64} icon={<UserOutlined />} />
+                  <div>
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {selectedStudent.first_name} {selectedStudent.last_name}
+                    </h3>
+                    <p className="text-gray-600 flex items-center gap-2">
+                      <MailOutlined />
+                      {selectedStudent.email}
+                    </p>
+                  </div>
+                </div>
 
-      {/* Notification Dialog */}
-      <Dialog open={notifyDialogOpen} onOpenChange={setNotifyDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t.notify}</DialogTitle>
-          </DialogHeader>
-          <ShadcnInput
-            value={notificationText}
-            onChange={(e) => setNotificationText(e.target.value)}
-            placeholder="Entrez votre message ici"
-          />
-          <DialogFooter>
-            <ShadcnButton onClick={sendNotification}>
-              {t.saveChanges}
-            </ShadcnButton>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                {/* Detailed Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <IdcardOutlined />
+                        Personal Information
+                      </h4>
+                      <div className="space-y-2">
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">First Name:</span>
+                          <span className="font-medium">
+                            {selectedStudent.first_name}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Last Name:</span>
+                          <span className="font-medium">
+                            {selectedStudent.last_name}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Date of Birth:</span>
+                          <span className="font-medium">
+                            {selectedStudent.date_of_birth}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">National ID:</span>
+                          <span className="font-medium">
+                            {selectedStudent.national_id}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Gender:</span>
+                          <Badge
+                            variant={
+                              selectedStudent.gender === "male"
+                                ? "default"
+                                : "secondary"
+                            }
+                          >
+                            {selectedStudent.gender === "male"
+                              ? t.male
+                              : t.female}
+                          </Badge>
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                        <TeamOutlined />
+                        Academic Information
+                      </h4>
+                      <div className="space-y-2">
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Level:</span>
+                          <span className="font-medium">
+                            {getLevelName(selectedStudent.level_id)}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Group:</span>
+                          <span className="font-medium">
+                            {getGroupName(selectedStudent.group_id)}
+                          </span>
+                        </p>
+                        <p className="flex justify-between">
+                          <span className="text-gray-600">Status:</span>
+                          <Badge
+                            variant="default"
+                            className="bg-green-100 text-green-800"
+                          >
+                            Approved
+                          </Badge>
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Contact Information */}
+                <Card>
+                  <CardContent className="p-4">
+                    <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                      <PhoneOutlined />
+                      Contact Information
+                    </h4>
+                    <div className="space-y-2">
+                      <p className="flex justify-between">
+                        <span className="text-gray-600">Email:</span>
+                        <span className="font-medium">
+                          {selectedStudent.email}
+                        </span>
+                      </p>
+                      <p className="flex justify-between">
+                        <span className="text-gray-600">Phone:</span>
+                        <span className="font-medium">
+                          {selectedStudent.phone_number || "Not provided"}
+                        </span>
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Student Dialog */}
+        <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+          <DialogContent className="max-w-md md:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{t.editStudentTitle}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm md:text-base">{t.level}</Label>
+                <Select
+                  value={editStudent?.level_id || ""}
+                  onValueChange={(value) =>
+                    setEditStudent((prev) => ({ ...prev, level_id: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choisir un niveau" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {levels.map((level) => (
+                      <SelectItem key={level.id} value={String(level.id)}>
+                        {level.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Label className="text-sm md:text-base">{t.group}</Label>
+                <Select
+                  value={editStudent?.group_id || "none"}
+                  onValueChange={(value) =>
+                    setEditStudent((prev) => ({ ...prev, group_id: value }))
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Choisir un groupe" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{t.unassigned}</SelectItem>
+                    {groups.map((group) => (
+                      <SelectItem key={group.id} value={String(group.id)}>
+                        {group.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <DialogFooter className="flex flex-col-reverse md:flex-row gap-2">
+              <ShadcnButton
+                variant="outline"
+                onClick={() => setEditDialogOpen(false)}
+              >
+                {t.cancel}
+              </ShadcnButton>
+              <ShadcnButton onClick={handleEditStudent}>
+                {t.saveChanges}
+              </ShadcnButton>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* PDF Dialog */}
+        <Dialog open={pdfDialogOpen} onOpenChange={setPdfDialogOpen}>
+          <DialogContent className="w-full h-[80vh] max-w-5xl p-2 md:p-6">
+            {pdfFile && (
+              <iframe
+                src={pdfFile}
+                className="w-full h-full rounded-md"
+                frameBorder="0"
+                title="PDF Document"
+              ></iframe>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Notification Dialog */}
+        <Dialog open={notifyDialogOpen} onOpenChange={setNotifyDialogOpen}>
+          <DialogContent className="max-w-md md:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>{t.notify}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <ShadcnInput
+                value={notificationText}
+                onChange={(e) => setNotificationText(e.target.value)}
+                placeholder="Entrez votre message ici"
+                className="w-full"
+              />
+            </div>
+            <DialogFooter className="flex flex-col-reverse md:flex-row gap-2">
+              <ShadcnButton
+                variant="outline"
+                onClick={() => setNotifyDialogOpen(false)}
+              >
+                {t.cancel}
+              </ShadcnButton>
+              <ShadcnButton onClick={sendNotification}>
+                {t.saveChanges}
+              </ShadcnButton>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     </div>
   );
 }

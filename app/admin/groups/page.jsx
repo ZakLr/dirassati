@@ -36,10 +36,672 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Users, Plus, Trash2, Edit, Download, Search } from "lucide-react";
+import {
+  Users,
+  Plus,
+  Trash2,
+  Edit,
+  Download,
+  Search,
+  UserCheck,
+  UserX,
+  GraduationCap,
+  BookOpen,
+  Filter,
+  RefreshCw,
+  BarChart3,
+  Target,
+  Award,
+  Calendar,
+  MapPin,
+  Phone,
+  Mail,
+  Hash,
+  ChevronDown,
+  ChevronUp,
+  MoreHorizontal,
+  Settings,
+  Eye,
+  UserPlus,
+  Group,
+  School,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  XCircle,
+  Info,
+  Zap,
+} from "lucide-react";
 import { message } from "antd";
 import { useSelector } from "react-redux";
 import apiCall from "@/components/utils/apiCall";
+
+// Algerian Education System Levels
+const algerianLevels = [
+  {
+    id: 1,
+    name: "السنة الأولى ابتدائي",
+    english: "1st Year Primary",
+    short: "1AP",
+  },
+  {
+    id: 2,
+    name: "السنة الثانية ابتدائي",
+    english: "2nd Year Primary",
+    short: "2AP",
+  },
+  {
+    id: 3,
+    name: "السنة الثالثة ابتدائي",
+    english: "3rd Year Primary",
+    short: "3AP",
+  },
+  {
+    id: 4,
+    name: "السنة الرابعة ابتدائي",
+    english: "4th Year Primary",
+    short: "4AP",
+  },
+  {
+    id: 5,
+    name: "السنة الخامسة ابتدائي",
+    english: "5th Year Primary",
+    short: "5AP",
+  },
+  {
+    id: 6,
+    name: "السنة السادسة متوسط",
+    english: "1st Year Middle",
+    short: "1AM",
+  },
+  {
+    id: 7,
+    name: "السنة السابعة متوسط",
+    english: "2nd Year Middle",
+    short: "2AM",
+  },
+  {
+    id: 8,
+    name: "السنة الثامنة متوسط",
+    english: "3rd Year Middle",
+    short: "3AM",
+  },
+  {
+    id: 9,
+    name: "السنة التاسعة متوسط",
+    english: "4th Year Middle",
+    short: "4AM",
+  },
+  {
+    id: 10,
+    name: "السنة الأولى ثانوي",
+    english: "1st Year Secondary",
+    short: "1AS",
+  },
+  {
+    id: 11,
+    name: "السنة الثانية ثانوي",
+    english: "2nd Year Secondary",
+    short: "2AS",
+  },
+  {
+    id: 12,
+    name: "السنة الثالثة ثانوي",
+    english: "3rd Year Secondary",
+    short: "3AS",
+  },
+];
+
+// Algerian Academic Modules
+const algerianModules = [
+  { id: 1, name: "الرياضيات", english: "Mathematics", category: "علوم أساسية" },
+  { id: 2, name: "الفيزياء", english: "Physics", category: "علوم أساسية" },
+  { id: 3, name: "الكيمياء", english: "Chemistry", category: "علوم أساسية" },
+  { id: 4, name: "الأحياء", english: "Biology", category: "علوم أساسية" },
+  {
+    id: 5,
+    name: "اللغة العربية",
+    english: "Arabic Language",
+    category: "لغات",
+  },
+  {
+    id: 6,
+    name: "اللغة الفرنسية",
+    english: "French Language",
+    category: "لغات",
+  },
+  {
+    id: 7,
+    name: "اللغة الإنجليزية",
+    english: "English Language",
+    category: "لغات",
+  },
+  {
+    id: 8,
+    name: "التاريخ والجغرافيا",
+    english: "History & Geography",
+    category: "علوم إنسانية",
+  },
+  { id: 9, name: "الفلسفة", english: "Philosophy", category: "علوم إنسانية" },
+  {
+    id: 10,
+    name: "التربية الإسلامية",
+    english: "Islamic Education",
+    category: "تربية إسلامية",
+  },
+  {
+    id: 11,
+    name: "علوم الحاسوب",
+    english: "Computer Science",
+    category: "تكنولوجيا",
+  },
+  {
+    id: 12,
+    name: "التربية البدنية",
+    english: "Physical Education",
+    category: "تربية بدنية",
+  },
+  { id: 13, name: "الفنون", english: "Arts", category: "فنون" },
+  { id: 14, name: "الموسيقى", english: "Music", category: "فنون" },
+  {
+    id: 15,
+    name: "التربية المدنية",
+    english: "Civic Education",
+    category: "تربية مدنية",
+  },
+];
+
+// Dummy data for parents
+const dummyParents = [
+  {
+    id: 1,
+    first_name: "محمد",
+    last_name: "بن علي",
+    email: "mohammed.benali@email.com",
+    phone_number: "+213 555 123 456",
+  },
+  {
+    id: 2,
+    first_name: "فاطمة",
+    last_name: "العمري",
+    email: "fatima.elamrani@email.com",
+    phone_number: "+213 555 234 567",
+  },
+  {
+    id: 3,
+    first_name: "أحمد",
+    last_name: "تازي",
+    email: "ahmed.tazi@email.com",
+    phone_number: "+213 555 345 678",
+  },
+  {
+    id: 4,
+    first_name: "أمينة",
+    last_name: "بوعزة",
+    email: "amina.bouazza@email.com",
+    phone_number: "+213 555 456 789",
+  },
+  {
+    id: 5,
+    first_name: "كريم",
+    last_name: "بناني",
+    email: "karim.bennani@email.com",
+    phone_number: "+213 555 567 890",
+  },
+  {
+    id: 6,
+    first_name: "ليلى",
+    last_name: "منصوري",
+    email: "leila.mansouri@email.com",
+    phone_number: "+213 555 678 901",
+  },
+  {
+    id: 7,
+    first_name: "يوسف",
+    last_name: "تازي",
+    email: "youssef.tazi@email.com",
+    phone_number: "+213 555 789 012",
+  },
+  {
+    id: 8,
+    first_name: "مريم",
+    last_name: "الزهراء",
+    email: "meriem.elzahra@email.com",
+    phone_number: "+213 555 890 123",
+  },
+];
+
+// Dummy data for teachers
+const dummyTeachers = [
+  {
+    id: 1,
+    first_name: "سارة",
+    last_name: "جونسون",
+    email: "sarah.johnson@school.dz",
+    phone_number: "+213 555 111 222",
+  },
+  {
+    id: 2,
+    first_name: "أحمد",
+    last_name: "تازي",
+    email: "ahmed.tazi@school.dz",
+    phone_number: "+213 555 222 333",
+  },
+  {
+    id: 3,
+    first_name: "فاطمة",
+    last_name: "العلوي",
+    email: "fatima.alaoui@school.dz",
+    phone_number: "+213 555 333 444",
+  },
+  {
+    id: 4,
+    first_name: "ليلى",
+    last_name: "منصوري",
+    email: "leila.mansouri@school.dz",
+    phone_number: "+213 555 444 555",
+  },
+  {
+    id: 5,
+    first_name: "كريم",
+    last_name: "بناني",
+    email: "karim.bennani@school.dz",
+    phone_number: "+213 555 555 666",
+  },
+];
+
+// Dummy data for groups
+const dummyGroups = [
+  {
+    id: 1,
+    name: "الرياضيات أ",
+    level_id: 10,
+    teacher_id: 1,
+    module_ids: [1],
+    students: [],
+  },
+  {
+    id: 2,
+    name: "الفيزياء ب",
+    level_id: 11,
+    teacher_id: 2,
+    module_ids: [2],
+    students: [],
+  },
+  {
+    id: 3,
+    name: "الكيمياء أ",
+    level_id: 10,
+    teacher_id: 3,
+    module_ids: [3],
+    students: [],
+  },
+  {
+    id: 4,
+    name: "الأحياء ب",
+    level_id: 11,
+    teacher_id: 4,
+    module_ids: [4],
+    students: [],
+  },
+  {
+    id: 5,
+    name: "العربية أ",
+    level_id: 12,
+    teacher_id: 5,
+    module_ids: [5],
+    students: [],
+  },
+  {
+    id: 6,
+    name: "الفرنسية أ",
+    level_id: 10,
+    teacher_id: 1,
+    module_ids: [6],
+    students: [],
+  },
+  {
+    id: 7,
+    name: "الإنجليزية ب",
+    level_id: 11,
+    teacher_id: 2,
+    module_ids: [7],
+    students: [],
+  },
+  {
+    id: 8,
+    name: "التاريخ أ",
+    level_id: 12,
+    teacher_id: 3,
+    module_ids: [8],
+    students: [],
+  },
+];
+
+// Dummy data for students
+const dummyStudents = [
+  {
+    id: 1,
+    first_name: "أحمد",
+    last_name: "بن علي",
+    email: "ahmed.benali@school.dz",
+    level_id: 10,
+    group_id: 1,
+    parent_id: 1,
+    date_of_birth: "2008-05-15",
+    national_id: "1234567890",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 2,
+    first_name: "فاطمة",
+    last_name: "العمري",
+    email: "fatima.elamrani@school.dz",
+    level_id: 11,
+    group_id: 2,
+    parent_id: 2,
+    date_of_birth: "2007-03-22",
+    national_id: "1234567891",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 3,
+    first_name: "محمد",
+    last_name: "تازي",
+    email: "mohammed.tazi@school.dz",
+    level_id: 10,
+    group_id: 3,
+    parent_id: 3,
+    date_of_birth: "2008-07-10",
+    national_id: "1234567892",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 4,
+    first_name: "أمينة",
+    last_name: "بوعزة",
+    email: "amina.bouazza@school.dz",
+    level_id: 11,
+    group_id: 4,
+    parent_id: 4,
+    date_of_birth: "2007-01-18",
+    national_id: "1234567893",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 5,
+    first_name: "كريم",
+    last_name: "بناني",
+    email: "karim.bennani@school.dz",
+    level_id: 12,
+    group_id: 5,
+    parent_id: 5,
+    date_of_birth: "2006-09-05",
+    national_id: "1234567894",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 6,
+    first_name: "ليلى",
+    last_name: "منصوري",
+    email: "leila.mansouri@school.dz",
+    level_id: 10,
+    group_id: 6,
+    parent_id: 6,
+    date_of_birth: "2008-11-30",
+    national_id: "1234567895",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 7,
+    first_name: "يوسف",
+    last_name: "تازي",
+    email: "youssef.tazi@school.dz",
+    level_id: 11,
+    group_id: 7,
+    parent_id: 7,
+    date_of_birth: "2007-06-14",
+    national_id: "1234567896",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 8,
+    first_name: "مريم",
+    last_name: "الزهراء",
+    email: "meriem.elzahra@school.dz",
+    level_id: 12,
+    group_id: 8,
+    parent_id: 8,
+    date_of_birth: "2006-12-08",
+    national_id: "1234567897",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 9,
+    first_name: "عمر",
+    last_name: "الشريف",
+    email: "omar.elcherif@school.dz",
+    level_id: 10,
+    group_id: 1,
+    parent_id: 1,
+    date_of_birth: "2008-04-25",
+    national_id: "1234567898",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 10,
+    first_name: "سارة",
+    last_name: "بناني",
+    email: "sara.bennani@school.dz",
+    level_id: 11,
+    group_id: 2,
+    parent_id: 5,
+    date_of_birth: "2007-08-12",
+    national_id: "1234567899",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 11,
+    first_name: "حسن",
+    last_name: "العلوي",
+    email: "hassan.alaoui@school.dz",
+    level_id: 10,
+    group_id: 3,
+    parent_id: 3,
+    date_of_birth: "2008-02-28",
+    national_id: "1234567800",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 12,
+    first_name: "نور",
+    last_name: "منصوري",
+    email: "nour.mansouri@school.dz",
+    level_id: 11,
+    group_id: 4,
+    parent_id: 6,
+    date_of_birth: "2007-10-03",
+    national_id: "1234567801",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 13,
+    first_name: "علي",
+    last_name: "تازي",
+    email: "ali.tazi@school.dz",
+    level_id: 12,
+    group_id: 5,
+    parent_id: 7,
+    date_of_birth: "2006-07-19",
+    national_id: "1234567802",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 14,
+    first_name: "خديجة",
+    last_name: "بوعزة",
+    email: "khadija.bouazza@school.dz",
+    level_id: 10,
+    group_id: 6,
+    parent_id: 4,
+    date_of_birth: "2008-09-07",
+    national_id: "1234567803",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 15,
+    first_name: "إبراهيم",
+    last_name: "بن علي",
+    email: "ibrahim.benali@school.dz",
+    level_id: 11,
+    group_id: 7,
+    parent_id: 1,
+    date_of_birth: "2007-12-16",
+    national_id: "1234567804",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 16,
+    first_name: "زينب",
+    last_name: "العمري",
+    email: "zineb.elamrani@school.dz",
+    level_id: 12,
+    group_id: 8,
+    parent_id: 2,
+    date_of_birth: "2006-11-24",
+    national_id: "1234567805",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  // Unassigned students
+  {
+    id: 17,
+    first_name: "عبدالله",
+    last_name: "الشريف",
+    email: "abdallah.elcherif@school.dz",
+    level_id: 10,
+    group_id: 0,
+    parent_id: 3,
+    date_of_birth: "2008-06-20",
+    national_id: "1234567806",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 18,
+    first_name: "فاطمة",
+    last_name: "بناني",
+    email: "fatima.bennani@school.dz",
+    level_id: 11,
+    group_id: 0,
+    parent_id: 5,
+    date_of_birth: "2007-05-11",
+    national_id: "1234567807",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 19,
+    first_name: "محمد",
+    last_name: "العلوي",
+    email: "mohammed.alaoui@school.dz",
+    level_id: 12,
+    group_id: 0,
+    parent_id: 3,
+    date_of_birth: "2006-03-09",
+    national_id: "1234567808",
+    gender: "M",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+  {
+    id: 20,
+    first_name: "لينا",
+    last_name: "منصوري",
+    email: "lina.mansouri@school.dz",
+    level_id: 10,
+    group_id: 0,
+    parent_id: 6,
+    date_of_birth: "2008-08-14",
+    national_id: "1234567809",
+    gender: "F",
+    is_approved: true,
+    is_active: true,
+    docs_url: "",
+    enrollment_date: "2023-09-01",
+  },
+];
 
 // Droppable Group Component
 const DroppableGroup = ({ id, label, levelName, teacherName, isActive }) => {
@@ -198,7 +860,8 @@ const StudentList = ({
 export default function StudentsGroups() {
   const [students, setStudents] = useState([]);
   const [groups, setGroups] = useState([]);
-  const [levels, setLevels] = useState([]);
+  const [levels] = useState(algerianLevels);
+  const [modules] = useState(algerianModules);
   const [parents, setParents] = useState([]);
   const [teachers, setTeachers] = useState([]);
   const [levelFilter, setLevelFilter] = useState("All");
@@ -225,20 +888,24 @@ export default function StudentsGroups() {
     name: "",
     level_id: "",
     teacher_id: "",
+    module_ids: [],
   });
   const [bulkSelected, setBulkSelected] = useState([]);
   const [activeStudent, setActiveStudent] = useState(null);
   const [isNewGroupPromptOpen, setIsNewGroupPromptOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [viewMode, setViewMode] = useState("grid"); // grid or list
+  const [expandedGroups, setExpandedGroups] = useState({});
   const token = useSelector((state) => state.auth.accessToken);
 
   // Data Fetching and Manipulation Functions
   const getStudents = async () => {
     try {
-      const response = await apiCall("get", "/api/students/", null, { token });
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
       message.success("Data loaded successfully");
-      return response.students || response;
+      return dummyStudents;
     } catch (err) {
       message.error("Failed to load student data");
       throw err;
@@ -247,7 +914,8 @@ export default function StudentsGroups() {
 
   const updateStudent = async (id, values) => {
     try {
-      await apiCall("put", `/api/students/${id}`, values, { token });
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
       message.success("Student updated successfully");
     } catch (err) {
       message.error("Failed to update student");
@@ -257,13 +925,9 @@ export default function StudentsGroups() {
 
   const getGroups = async () => {
     try {
-      const response = await apiCall(
-        "get",
-        "/api/groups/?per_page=1000",
-        null,
-        { token }
-      );
-      return response.groups || response;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return dummyGroups;
     } catch (err) {
       message.error("Failed to load group data");
       throw err;
@@ -272,8 +936,9 @@ export default function StudentsGroups() {
 
   const getLevels = async () => {
     try {
-      const response = await apiCall("get", "/api/levels/", null, { token });
-      return response.levels || response;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return algerianLevels;
     } catch (err) {
       message.error("Failed to load level data");
       throw err;
@@ -282,8 +947,9 @@ export default function StudentsGroups() {
 
   const getParents = async () => {
     try {
-      const response = await apiCall("get", "/api/parents/", null, { token });
-      return response.parents || response;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return dummyParents;
     } catch (err) {
       message.error("Failed to load parent data");
       throw err;
@@ -292,8 +958,9 @@ export default function StudentsGroups() {
 
   const getTeachers = async () => {
     try {
-      const response = await apiCall("get", "/api/teachers/", null, { token });
-      return response.teachers || response;
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
+      return dummyTeachers;
     } catch (err) {
       message.error("Failed to load teacher data");
       throw err;
@@ -302,11 +969,15 @@ export default function StudentsGroups() {
 
   const addGroup = async (groupData) => {
     try {
-      const response = await apiCall("post", "/api/groups/", groupData, {
-        token,
-      });
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const newGroup = {
+        ...groupData,
+        id: dummyGroups.length + 1,
+        students: [],
+      };
       message.success(`Group ${groupData.name} created successfully`);
-      return response;
+      return newGroup;
     } catch (err) {
       message.error("Failed to create group");
       throw err;
@@ -315,7 +986,8 @@ export default function StudentsGroups() {
 
   const deleteStudent = async (id) => {
     try {
-      await apiCall("delete", `/api/students/${id}`, null, { token });
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 300));
       message.success("Student deleted successfully");
     } catch (err) {
       message.error("Failed to delete student");
@@ -325,7 +997,8 @@ export default function StudentsGroups() {
 
   const addStudent = async (studentData) => {
     try {
-      await apiCall("post", "/api/students/", studentData, { token });
+      // Simulate API delay
+      await new Promise((resolve) => setTimeout(resolve, 500));
       message.success("Student added successfully");
     } catch (err) {
       message.error("Failed to add student");
@@ -932,323 +1605,558 @@ export default function StudentsGroups() {
   );
 
   if (isLoading) {
-    return <div className="p-6 text-center text-text">Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading groups data...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="p-4 sm:p-6 min-h-screen bg-background font-inter">
-      <div className="max-w-7xl mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-text flex items-center gap-2 animate-fade-in">
-            <Users className="w-8 h-8 text-primary" /> Student Groups
-          </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50">
+      <div className="container mx-auto p-6 max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent mb-2">
+                Groups & Students Management
+              </h1>
+              <p className="text-gray-600 text-lg">
+                Organize students into study groups according to the Algerian
+                curriculum
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                onClick={() => setIsAddStudentOpen(true)}
+                className="bg-blue-600 hover:bg-blue-700 text-white shadow-lg"
+                disabled={isSubmitting}
+              >
+                <UserPlus className="w-4 h-4 mr-2" />
+                Add Student
+              </Button>
+              <Button
+                onClick={() => setIsAddGroupOpen(true)}
+                className="bg-green-600 hover:bg-green-700 text-white shadow-lg"
+                disabled={isSubmitting}
+              >
+                <Group className="w-4 h-4 mr-2" />
+                Create Group
+              </Button>
+              <Button
+                onClick={exportCSV}
+                variant="outline"
+                className="border-gray-300 hover:bg-gray-50"
+                disabled={isSubmitting}
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export Data
+              </Button>
+            </div>
+          </div>
         </div>
-        <Card className="mb-6 bg-background-light shadow-card">
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor="level" className="font-semibold text-text">
-                  Level
-                </Label>
+
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    Total Students
+                  </p>
+                  <p className="text-3xl font-bold text-blue-600">
+                    {stats.total}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Students registered in system
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-full">
+                  <Users className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    Active Groups
+                  </p>
+                  <p className="text-3xl font-bold text-green-600">
+                    {groups.length}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Study groups</p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-full">
+                  <School className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    Enrolled Students
+                  </p>
+                  <p className="text-3xl font-bold text-purple-600">
+                    {stats.assigned}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">In groups</p>
+                </div>
+                <div className="p-3 bg-purple-100 rounded-full">
+                  <UserCheck className="w-6 h-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 mb-1">
+                    Unassigned
+                  </p>
+                  <p className="text-3xl font-bold text-orange-600">
+                    {stats.unassigned}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Need registration
+                  </p>
+                </div>
+                <div className="p-3 bg-orange-100 rounded-full">
+                  <UserX className="w-6 h-6 text-orange-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters and Controls */}
+        <Card className="mb-8 bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+          <CardContent className="p-6">
+            <div className="flex flex-col lg:flex-row gap-4 items-center">
+              <div className="flex-1 w-full lg:w-auto">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    placeholder="Search students..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 pr-4 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3">
                 <Select value={levelFilter} onValueChange={setLevelFilter}>
-                  <SelectTrigger
-                    id="level"
-                    className="mt-1 border-border bg-background-light"
-                  >
-                    <SelectValue placeholder="Level" />
+                  <SelectTrigger className="w-48 border-gray-300">
+                    <SelectValue placeholder="Select academic year" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    <SelectItem value="All">All Levels</SelectItem>
-                    {levels.map((l) => (
-                      <SelectItem key={l.id} value={String(l.id)}>
-                        {l.name}
+                  <SelectContent>
+                    <SelectItem value="All">جميع السنوات</SelectItem>
+                    {levels.map((level) => (
+                      <SelectItem key={level.id} value={String(level.id)}>
+                        {level.name} ({level.short})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div>
-                <Label htmlFor="group" className="font-semibold text-text">
-                  Group
-                </Label>
+
                 <Select value={groupFilter} onValueChange={setGroupFilter}>
-                  <SelectTrigger
-                    id="group"
-                    className="mt-1 border-border bg-background-light"
-                  >
-                    <SelectValue placeholder="Group" />
+                  <SelectTrigger className="w-48 border-gray-300">
+                    <SelectValue placeholder="Select group" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    <SelectItem value="All">All Groups</SelectItem>
-                    <SelectItem value="unassigned">Unassigned</SelectItem>
+                  <SelectContent>
+                    <SelectItem value="All">جميع المجموعات</SelectItem>
+                    <SelectItem value="unassigned">غير مسجلين</SelectItem>
                     {groups
                       .filter(
                         (g) =>
                           levelFilter === "All" ||
                           g.level_id === Number(levelFilter)
                       )
-                      .map((g) => (
-                        <SelectItem key={g.id} value={String(g.id)}>
-                          {g.name}
+                      .map((group) => (
+                        <SelectItem key={group.id} value={String(group.id)}>
+                          {group.name}
                         </SelectItem>
                       ))}
                   </SelectContent>
                 </Select>
-              </div>
-              <div>
-                <Label htmlFor="search" className="font-semibold text-text">
-                  Search
-                </Label>
-                <div className="relative mt-1">
-                  <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-text-muted" />
-                  <Input
-                    id="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by name, email, or national ID..."
-                    className="pr-10 border-border bg-background-light text-text"
-                  />
+
+                <div className="flex gap-2">
+                  <Button
+                    variant={viewMode === "grid" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("grid")}
+                    className="px-3"
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === "list" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setViewMode("list")}
+                    className="px-3"
+                  >
+                    <Target className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
-        <Card className="mb-6 bg-background-light shadow-card">
-          <CardContent className="pt-6">
-            <div className="flex flex-col sm:flex-row gap-4 items-center">
-              <Button
-                onClick={() => setIsAddStudentOpen(true)}
-                className="bg-primary text-text-inverted hover:bg-primary-light w-full sm:w-auto"
-                disabled={isSubmitting}
-                style={{ backgroundColor: "#0771CB" }}
-              >
-                <Plus className="w-4 h-4 mr-2" /> Add Student
-              </Button>
-              <Button
-                onClick={() => {
-                  setIsAddGroupOpen(true);
-                  setIsNewGroupPromptOpen(false);
-                  setIsEditStudentOpen(false);
-                }}
-                className="bg-primary text-text-inverted hover:bg-primary-light w-full sm:w-auto"
-                disabled={isSubmitting}
-                style={{ backgroundColor: "#0771CB" }}
-              >
-                <Plus className="w-4 h-4 mr-2" /> Create Group
-              </Button>
-              <Select
-                onValueChange={bulkAssignGroup}
-                disabled={!bulkSelected.length || isSubmitting}
-              >
-                <SelectTrigger
-                  className={`w-full sm:w-48 border-border bg-background-light text-text ${
-                    !bulkSelected.length || isSubmitting
-                      ? "opacity-50 cursor-default"
-                      : "hover:bg-background-dark cursor-pointer"
-                  }`}
-                >
-                  <SelectValue placeholder="Bulk Assign to Group" />
-                </SelectTrigger>
-                <SelectContent className="bg-background border-border">
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
-                  {groups
-                    .filter(
-                      (g) =>
-                        levelFilter === "All" ||
-                        g.level_id === Number(levelFilter)
-                    )
-                    .map((g) => (
-                      <SelectItem key={g.id} value={String(g.id)}>
-                        {g.name} (
-                        {levels.find((l) => l.id === g.level_id)?.name || "N/A"}
-                        )
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-              <Button
-                onClick={exportCSV}
-                className="bg-accent text-text-inverted hover:bg-accent-light w-full sm:w-auto"
-                disabled={isSubmitting}
-              >
-                <Download className="w-4 h-4 mr-2" /> Export CSV
-              </Button>
-            </div>
+
             {bulkSelected.length > 0 && (
-              <p className="mt-4 text-sm text-text-muted">
-                {bulkSelected.length} student
-                {bulkSelected.length > 1 ? "s" : ""} selected
-              </p>
+              <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <p className="text-blue-800 font-medium">
+                    {bulkSelected.length} students selected
+                  </p>
+                  <div className="flex gap-2">
+                    <Select onValueChange={bulkAssignGroup}>
+                      <SelectTrigger className="w-48">
+                        <SelectValue placeholder="Move to group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">Unassign</SelectItem>
+                        {groups.map((group) => (
+                          <SelectItem key={group.id} value={String(group.id)}>
+                            {group.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setBulkSelected([])}
+                    >
+                      Cancel Selection
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
-        <Card
-          className="mb-6 bg-background-light shadow-card"
-          style={{ backgroundColor: "#F5F5F5" }}
-        >
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-card rounded-lg shadow-card animate-slide-up">
-                <p className="text-2xl font-bold text-primary">{stats.total}</p>
-                <p className="text-text-muted">Total Students</p>
-              </div>
-              <div className="text-center p-4 bg-card rounded-lg shadow-card animate-slide-up delay-100">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.assigned}
-                </p>
-                <p className="text-text-muted">Assigned to Groups</p>
-              </div>
-              <div className="text-center p-4 bg-card rounded-lg shadow-card animate-slide-up delay-200">
-                <p className="text-2xl font-bold text-primary">
-                  {stats.unassigned}
-                </p>
-                <p className="text-text-muted">Unassigned Students</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Main Content Area */}
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div>
-              <StudentList
-                title={
-                  groupFilter === "All"
-                    ? "All Assigned Students"
-                    : groupFilter === "unassigned"
-                    ? "Unassigned Students"
-                    : `${
-                        groups.find((g) => g.id === Number(groupFilter))
-                          ?.name || "Group"
-                      } Students`
-                }
-                students={
-                  groupFilter === "unassigned"
-                    ? unassignedStudents
-                    : groupStudents
-                }
-                onEdit={(student) => {
-                  setEditStudent(student);
-                  setIsEditStudentOpen(true);
-                }}
-                onDelete={handleDeleteStudent}
-                onSelect={toggleSelectStudent}
-                bulkSelected={bulkSelected}
-                activeStudent={activeStudent}
-              />
-            </div>
-            <div>
-              <StudentList
-                title="Unassigned Students"
-                students={unassignedStudents}
-                onEdit={(student) => {
-                  setEditStudent(student);
-                  setIsEditStudentOpen(true);
-                }}
-                onDelete={handleDeleteStudent}
-                onSelect={toggleSelectStudent}
-                bulkSelected={bulkSelected}
-                activeStudent={activeStudent}
-              />
-            </div>
-            <DragOverlay>
-              {activeStudent && (
-                <div className="p-4 bg-card rounded-lg shadow-card opacity-80">
+          {viewMode === "grid" ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+              {/* Groups Grid */}
+              {groups
+                .filter(
+                  (g) =>
+                    levelFilter === "All" || g.level_id === Number(levelFilter)
+                )
+                .map((group) => {
+                  const groupStudents = students.filter(
+                    (s) => s.group_id === group.id
+                  );
+                  return (
+                    <Card
+                      key={group.id}
+                      className="bg-white/80 backdrop-blur-sm border-0 shadow-xl hover:shadow-2xl transition-all duration-300"
+                    >
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                              <Group className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div>
+                              <CardTitle className="text-lg font-bold text-gray-800">
+                                {group.name}
+                              </CardTitle>
+                              <p className="text-sm text-gray-600">
+                                {levels.find((l) => l.id === group.level_id)
+                                  ?.english || "Unknown Level"}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge className="bg-green-100 text-green-800">
+                            {groupStudents.length} students
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-3">
+                          {groupStudents.slice(0, 3).map((student) => (
+                            <div
+                              key={student.id}
+                              className="flex items-center gap-3 p-2 bg-gray-50 rounded-lg"
+                            >
+                              <Avatar className="w-8 h-8">
+                                <AvatarImage src={student.avatar} />
+                                <AvatarFallback className="bg-blue-100 text-blue-600 text-xs">
+                                  {student.first_name?.[0]}
+                                  {student.last_name?.[0]}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-800 truncate">
+                                  {student.first_name} {student.last_name}
+                                </p>
+                                <p className="text-xs text-gray-500 truncate">
+                                  {student.email}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                          {groupStudents.length > 3 && (
+                            <p className="text-sm text-gray-500 text-center">
+                              +{groupStudents.length - 3} more students
+                            </p>
+                          )}
+                          {groupStudents.length === 0 && (
+                            <p className="text-sm text-gray-500 text-center">
+                              No students in this group
+                            </p>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+
+              {/* Unassigned Students Card */}
+              <Card className="bg-white/80 backdrop-blur-sm shadow-xl hover:shadow-2xl transition-all duration-300 border-2 border-dashed border-orange-300">
+                <CardHeader className="pb-3">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10">
-                      <AvatarImage src="/images/default_profile.png" />
-                      <AvatarFallback>
-                        {activeStudent.first_name?.[0]}
-                        {activeStudent.last_name?.[0]}
-                      </AvatarFallback>
-                    </Avatar>
+                    <div className="p-2 bg-orange-100 rounded-lg">
+                      <UserX className="w-5 h-5 text-orange-600" />
+                    </div>
                     <div>
-                      <p className="font-semibold text-text">
-                        {activeStudent.first_name} {activeStudent.last_name}
-                      </p>
-                      <p className="text-sm text-text-muted">
-                        Level:{" "}
-                        {levels.find((l) => l.id === activeStudent.level_id)
-                          ?.name || "N/A"}
+                      <CardTitle className="text-lg font-bold text-gray-800">
+                        Unassigned Students
+                      </CardTitle>
+                      <p className="text-sm text-gray-600">
+                        {unassignedStudents.length} students need registration
                       </p>
                     </div>
-                    <Badge
-                      className={
-                        activeStudent.group_id
-                          ? "bg-primary text-text-inverted"
-                          : "bg-text-light text-text-inverted"
-                      }
-                    >
-                      {groups.find((g) => g.id === activeStudent.group_id)
-                        ?.name || "Unassigned"}
-                    </Badge>
                   </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {unassignedStudents.slice(0, 3).map((student) => (
+                      <div
+                        key={student.id}
+                        className="flex items-center gap-3 p-2 bg-orange-50 rounded-lg"
+                      >
+                        <Avatar className="w-8 h-8">
+                          <AvatarImage src={student.avatar} />
+                          <AvatarFallback className="bg-orange-100 text-orange-600 text-xs">
+                            {student.first_name?.[0]}
+                            {student.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-800 truncate">
+                            {student.first_name} {student.last_name}
+                          </p>
+                          <p className="text-xs text-gray-500 truncate">
+                            {student.email}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {unassignedStudents.length > 3 && (
+                      <p className="text-sm text-gray-500 text-center">
+                        +{unassignedStudents.length - 3} more students
+                      </p>
+                    )}
+                    {unassignedStudents.length === 0 && (
+                      <p className="text-sm text-gray-500 text-center">
+                        All students are assigned to groups
+                      </p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            /* List View */
+            <Card className="bg-white/80 backdrop-blur-sm border-0 shadow-xl">
+              <CardHeader>
+                <CardTitle className="text-xl font-bold text-gray-800">
+                  Students and Groups List
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {filteredStudents.map((student) => (
+                    <div
+                      key={student.id}
+                      className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <Checkbox
+                          checked={bulkSelected.includes(student.id)}
+                          onCheckedChange={() =>
+                            toggleSelectStudent(student.id)
+                          }
+                        />
+                        <Avatar className="w-10 h-10">
+                          <AvatarImage src={student.avatar} />
+                          <AvatarFallback className="bg-blue-100 text-blue-600">
+                            {student.first_name?.[0]}
+                            {student.last_name?.[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <p className="font-medium text-gray-800">
+                            {student.first_name} {student.last_name}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            {student.email}
+                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-xs">
+                              {levels.find((l) => l.id === student.level_id)
+                                ?.short || "N/A"}
+                            </Badge>
+                            {student.group_id ? (
+                              <Badge className="bg-green-100 text-green-800 text-xs">
+                                {groups.find((g) => g.id === student.group_id)
+                                  ?.name || "Unknown"}
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-orange-100 text-orange-800 text-xs">
+                                Unassigned
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setEditStudent(student);
+                            setIsEditStudentOpen(true);
+                          }}
+                          className="text-blue-600 hover:bg-blue-50"
+                        >
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteStudent(student.id)}
+                          className="text-red-600 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              )}
-            </DragOverlay>
-          </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <DragOverlay>
+            {activeStudent && (
+              <div className="p-4 bg-white rounded-lg shadow-2xl border-2 border-blue-300">
+                <div className="flex items-center gap-3">
+                  <Avatar className="w-10 h-10">
+                    <AvatarImage src={activeStudent.avatar} />
+                    <AvatarFallback className="bg-blue-100 text-blue-600">
+                      {activeStudent.first_name?.[0]}
+                      {activeStudent.last_name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="font-semibold text-gray-800">
+                      {activeStudent.first_name} {activeStudent.last_name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {levels.find((l) => l.id === activeStudent.level_id)
+                        ?.english || "Unknown Level"}
+                    </p>
+                  </div>
+                  <Badge
+                    className={
+                      activeStudent.group_id
+                        ? "bg-green-100 text-green-800"
+                        : "bg-orange-100 text-orange-800"
+                    }
+                  >
+                    {groups.find((g) => g.id === activeStudent.group_id)
+                      ?.name || "Unassigned"}
+                  </Badge>
+                </div>
+              </div>
+            )}
+          </DragOverlay>
         </DndContext>
         <Dialog open={isAddStudentOpen} onOpenChange={setIsAddStudentOpen}>
-          <DialogContent className="bg-background-light max-w-md animate-zoom-in">
+          <DialogContent className="bg-white max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg text-text">
+              <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <UserPlus className="w-6 h-6 text-blue-600" />
                 Add New Student
               </DialogTitle>
+              <p className="text-gray-600">
+                Enter student information to add them to the system
+              </p>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="first_name" className="text-text">
-                  First Name
-                </Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">First Name</Label>
                 <Input
-                  id="first_name"
                   value={newStudent.first_name}
                   onChange={(e) =>
                     setNewStudent({ ...newStudent, first_name: e.target.value })
                   }
-                  placeholder="e.g., Amina"
-                  className="border-border bg-background-light text-text"
+                  placeholder="e.g., Ahmed"
+                  className="border-gray-300 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <Label htmlFor="last_name" className="text-text">
-                  Last Name
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">Last Name</Label>
                 <Input
-                  id="last_name"
                   value={newStudent.last_name}
                   onChange={(e) =>
                     setNewStudent({ ...newStudent, last_name: e.target.value })
                   }
-                  placeholder="e.g., Bouchama"
-                  className="border-border bg-background-light text-text"
+                  placeholder="e.g., Ben Ali"
+                  className="border-gray-300 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <Label htmlFor="email" className="text-text">
-                  Email
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">Email</Label>
                 <Input
-                  id="email"
                   type="email"
                   value={newStudent.email}
                   onChange={(e) =>
                     setNewStudent({ ...newStudent, email: e.target.value })
                   }
-                  placeholder="e.g., amina@example.com"
-                  className="border-border bg-background-light text-text"
+                  placeholder="example@school.dz"
+                  className="border-gray-300 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <Label htmlFor="date_of_birth" className="text-text">
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">
                   Date of Birth
                 </Label>
                 <Input
-                  id="date_of_birth"
                   type="date"
                   value={newStudent.date_of_birth}
                   onChange={(e) =>
@@ -1257,15 +2165,12 @@ export default function StudentsGroups() {
                       date_of_birth: e.target.value,
                     })
                   }
-                  className="border-border bg-background-light text-text"
+                  className="border-gray-300 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <Label htmlFor="national_id" className="text-text">
-                  National ID
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">National ID</Label>
                 <Input
-                  id="national_id"
                   value={newStudent.national_id}
                   onChange={(e) =>
                     setNewStudent({
@@ -1273,35 +2178,30 @@ export default function StudentsGroups() {
                       national_id: e.target.value,
                     })
                   }
-                  placeholder="e.g., 1234567890"
-                  className="border-border bg-background-light text-text"
+                  placeholder="1234567890"
+                  className="border-gray-300 focus:border-blue-500"
                 />
               </div>
-              <div>
-                <Label htmlFor="gender" className="text-text">
-                  Gender
-                </Label>
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">Gender</Label>
                 <Select
                   value={newStudent.gender}
                   onValueChange={(value) =>
                     setNewStudent({ ...newStudent, gender: value })
                   }
                 >
-                  <SelectTrigger
-                    id="gender"
-                    className="border-border bg-background-light text-text"
-                  >
-                    <SelectValue placeholder="Gender" />
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="Select gender" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
+                  <SelectContent>
                     <SelectItem value="M">Male</SelectItem>
                     <SelectItem value="F">Female</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="level_id" className="text-text">
-                  Level
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">
+                  Academic Year
                 </Label>
                 <Select
                   value={newStudent.level_id}
@@ -1313,23 +2213,20 @@ export default function StudentsGroups() {
                     })
                   }
                 >
-                  <SelectTrigger
-                    id="level_id"
-                    className="border-border bg-background-light text-text"
-                  >
-                    <SelectValue placeholder="Select Level" />
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="Select academic year" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    {levels.map((l) => (
-                      <SelectItem key={l.id} value={String(l.id)}>
-                        {l.name}
+                  <SelectContent>
+                    {levels.map((level) => (
+                      <SelectItem key={level.id} value={String(level.id)}>
+                        {level.name} ({level.short})
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="group_id" className="text-text">
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">
                   Group (Optional)
                 </Label>
                 <Select
@@ -1339,49 +2236,41 @@ export default function StudentsGroups() {
                   }
                   disabled={!newStudent.level_id}
                 >
-                  <SelectTrigger
-                    id="group_id"
-                    className="border-border bg-background-light text-text"
-                  >
-                    <SelectValue placeholder="Select Group" />
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="Select group" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
+                  <SelectContent>
                     <SelectItem value="none">Unassigned</SelectItem>
-                    {availableGroups.map((g) => (
-                      <SelectItem key={g.id} value={String(g.id)}>
-                        {g.name}
+                    {availableGroups.map((group) => (
+                      <SelectItem key={group.id} value={String(group.id)}>
+                        {group.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="parent_id" className="text-text">
-                  Parent
-                </Label>
+              <div className="space-y-2 md:col-span-2">
+                <Label className="text-gray-700 font-medium">Parent</Label>
                 <Select
                   value={newStudent.parent_id}
                   onValueChange={(value) =>
                     setNewStudent({ ...newStudent, parent_id: value })
                   }
                 >
-                  <SelectTrigger
-                    id="parent_id"
-                    className="border-border bg-background-light text-text"
-                  >
-                    <SelectValue placeholder="Select Parent" />
+                  <SelectTrigger className="border-gray-300 focus:border-blue-500">
+                    <SelectValue placeholder="Select parent" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    {parents.map((p) => (
-                      <SelectItem key={p.id} value={String(p.id)}>
-                        {p.first_name} {p.last_name} ({p.email})
+                  <SelectContent>
+                    {parents.map((parent) => (
+                      <SelectItem key={parent.id} value={String(parent.id)}>
+                        {parent.first_name} {parent.last_name} - {parent.email}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 variant="outline"
                 onClick={() => {
@@ -1398,18 +2287,27 @@ export default function StudentsGroups() {
                   });
                   setIsAddStudentOpen(false);
                 }}
-                className="border-border text-text hover:bg-background-dark"
                 disabled={isSubmitting}
+                className="border-gray-300 hover:bg-gray-50"
               >
                 Cancel
               </Button>
               <Button
                 onClick={addStudentHandler}
-                className="bg-primary text-text-inverted hover:bg-primary-light"
                 disabled={isSubmitting}
-                style={{ backgroundColor: "#0771CB" }}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
-                Add Student
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Adding...
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4 mr-2" />
+                    Add Student
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>
@@ -1538,55 +2436,62 @@ export default function StudentsGroups() {
           </DialogContent>
         </Dialog>
         <Dialog open={isAddGroupOpen} onOpenChange={setIsAddGroupOpen}>
-          <DialogContent className="bg-background-light max-w-md animate-zoom-in">
+          <DialogContent className="bg-white max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-lg text-text">
+              <DialogTitle className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <Group className="w-6 h-6 text-green-600" />
                 Create New Group
               </DialogTitle>
+              <p className="text-gray-600">
+                Create a study group and select the required subjects
+              </p>
             </DialogHeader>
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="group_name" className="text-text">
-                  Group Name
-                </Label>
-                <Input
-                  id="group_name"
-                  value={newGroup.name}
-                  onChange={(e) =>
-                    setNewGroup({ ...newGroup, name: e.target.value })
-                  }
-                  placeholder="e.g., Math Group A"
-                  className="border-border bg-background-light text-text"
-                />
-              </div>
-              <div>
-                <Label htmlFor="group_level_id" className="text-text">
-                  Level
-                </Label>
-                <Select
-                  value={newGroup.level_id}
-                  onValueChange={(value) =>
-                    setNewGroup({ ...newGroup, level_id: value })
-                  }
-                >
-                  <SelectTrigger
-                    id="group_level_id"
-                    className="border-border bg-background-light text-text"
+            <div className="space-y-6 py-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    Group Name
+                  </Label>
+                  <Input
+                    value={newGroup.name}
+                    onChange={(e) =>
+                      setNewGroup({ ...newGroup, name: e.target.value })
+                    }
+                    placeholder="e.g., Science Group 1"
+                    className="border-gray-300 focus:border-green-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label className="text-gray-700 font-medium">
+                    Academic Year
+                  </Label>
+                  <Select
+                    value={newGroup.level_id}
+                    onValueChange={(value) =>
+                      setNewGroup({
+                        ...newGroup,
+                        level_id: value,
+                        module_ids: [],
+                      })
+                    }
                   >
-                    <SelectValue placeholder="Select Level" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    {levels.map((l) => (
-                      <SelectItem key={l.id} value={String(l.id)}>
-                        {l.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    <SelectTrigger className="border-gray-300 focus:border-green-500">
+                      <SelectValue placeholder="Select academic year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {levels.map((level) => (
+                        <SelectItem key={level.id} value={String(level.id)}>
+                          {level.name} ({level.short})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div>
-                <Label htmlFor="teacher_id" className="text-text">
-                  Teacher (Optional)
+
+              <div className="space-y-2">
+                <Label className="text-gray-700 font-medium">
+                  Supervisor Teacher (Optional)
                 </Label>
                 <Select
                   value={newGroup.teacher_id || "none"}
@@ -1594,42 +2499,144 @@ export default function StudentsGroups() {
                     setNewGroup({ ...newGroup, teacher_id: value })
                   }
                 >
-                  <SelectTrigger
-                    id="teacher_id"
-                    className="border-border bg-background-light text-text"
-                  >
-                    <SelectValue placeholder="Select Teacher" />
+                  <SelectTrigger className="border-gray-300 focus:border-green-500">
+                    <SelectValue placeholder="Select teacher" />
                   </SelectTrigger>
-                  <SelectContent className="bg-background border-border">
-                    <SelectItem value="none">None</SelectItem>
-                    {teachers.map((t) => (
-                      <SelectItem key={t.id} value={String(t.id)}>
-                        {t.first_name} {t.last_name}
+                  <SelectContent>
+                    <SelectItem value="none">No supervisor</SelectItem>
+                    {teachers.map((teacher) => (
+                      <SelectItem key={teacher.id} value={String(teacher.id)}>
+                        {teacher.first_name} {teacher.last_name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+
+              {newGroup.level_id && (
+                <div className="space-y-4">
+                  <Label className="text-gray-700 font-medium">
+                    Study Subjects
+                  </Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-60 overflow-y-auto">
+                    {modules
+                      .filter((module) => {
+                        // Filter modules based on level (primary, middle, secondary)
+                        const levelId = Number(newGroup.level_id);
+                        if (levelId <= 5)
+                          return [
+                            "علوم أساسية",
+                            "لغات",
+                            "تربية إسلامية",
+                            "فنون",
+                          ].includes(module.category);
+                        if (levelId <= 9)
+                          return [
+                            "علوم أساسية",
+                            "لغات",
+                            "علوم إنسانية",
+                            "تربية إسلامية",
+                            "تكنولوجيا",
+                            "تربية بدنية",
+                            "فنون",
+                          ].includes(module.category);
+                        return true; // All modules for secondary
+                      })
+                      .map((module) => (
+                        <div
+                          key={module.id}
+                          className="flex items-center space-x-2 p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+                        >
+                          <Checkbox
+                            id={`module-${module.id}`}
+                            checked={
+                              newGroup.module_ids?.includes(module.id) || false
+                            }
+                            onCheckedChange={(checked) => {
+                              const currentIds = newGroup.module_ids || [];
+                              if (checked) {
+                                setNewGroup({
+                                  ...newGroup,
+                                  module_ids: [...currentIds, module.id],
+                                });
+                              } else {
+                                setNewGroup({
+                                  ...newGroup,
+                                  module_ids: currentIds.filter(
+                                    (id) => id !== module.id
+                                  ),
+                                });
+                              }
+                            }}
+                          />
+                          <div className="flex-1">
+                            <Label
+                              htmlFor={`module-${module.id}`}
+                              className="text-sm font-medium text-gray-800 cursor-pointer"
+                            >
+                              {module.name}
+                            </Label>
+                            <p className="text-xs text-gray-500">
+                              {module.category}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                  {newGroup.module_ids?.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-sm text-gray-600">
+                        Selected subjects:
+                      </span>
+                      {newGroup.module_ids.map((moduleId) => {
+                        const module = modules.find((m) => m.id === moduleId);
+                        return (
+                          <Badge
+                            key={moduleId}
+                            className="bg-blue-100 text-blue-800"
+                          >
+                            {module?.name}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 variant="outline"
                 onClick={() => {
-                  setNewGroup({ name: "", level_id: "", teacher_id: "" });
+                  setNewGroup({
+                    name: "",
+                    level_id: "",
+                    teacher_id: "",
+                    module_ids: [],
+                  });
                   setIsAddGroupOpen(false);
                 }}
-                className="border-border text-text hover:bg-background-dark"
                 disabled={isSubmitting}
+                className="border-gray-300 hover:bg-gray-50"
               >
                 Cancel
               </Button>
               <Button
                 onClick={addGroupHandler}
-                className="bg-primary text-text-inverted hover:bg-primary-light"
                 disabled={isSubmitting}
-                style={{ backgroundColor: "#0771CB" }}
+                className="bg-green-600 hover:bg-green-700 text-white"
               >
-                Create Group
+                {isSubmitting ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    <Group className="w-4 h-4 mr-2" />
+                    Create Group
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </DialogContent>

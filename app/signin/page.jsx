@@ -13,7 +13,7 @@ export default function SignInSelection() {
         <div className="text-center mb-8">
           <div className="inline-block">
             <h1 className="text-4xl font-bold bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-2">
-              EduManage
+              Dirassati
             </h1>
             <p className="text-gray-600 text-sm">Education Management System</p>
           </div>
@@ -72,7 +72,7 @@ export default function SignInSelection() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-gray-500 text-sm">
-            © 2024 EduManage. All rights reserved.
+            © 2024 Dirassati. All rights reserved.
           </p>
         </div>
       </div>

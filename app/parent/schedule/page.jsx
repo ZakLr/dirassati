@@ -2,15 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -19,8 +11,86 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar, Globe, GraduationCap } from "lucide-react";
+import {
+  Calendar,
+  Globe,
+  GraduationCap,
+  Clock,
+  MapPin,
+  User,
+  ArrowLeft,
+} from "lucide-react";
 import styled from "styled-components";
+
+// Module color and icon mapping (simplified for parent view)
+const moduleStyles = {
+  العربية: {
+    color: "from-blue-500 to-cyan-500",
+    bgColor: "from-blue-50 to-cyan-50",
+    borderColor: "border-blue-200",
+    icon: GraduationCap,
+    textColor: "text-blue-700",
+  },
+  رياضيات: {
+    color: "from-green-500 to-emerald-500",
+    bgColor: "from-green-50 to-emerald-50",
+    borderColor: "border-green-200",
+    icon: GraduationCap,
+    textColor: "text-green-700",
+  },
+  فرنسية: {
+    color: "from-purple-500 to-pink-500",
+    bgColor: "from-purple-50 to-pink-50",
+    borderColor: "border-purple-200",
+    icon: GraduationCap,
+    textColor: "text-purple-700",
+  },
+  علوم: {
+    color: "from-emerald-500 to-teal-500",
+    bgColor: "from-emerald-50 to-teal-50",
+    borderColor: "border-emerald-200",
+    icon: GraduationCap,
+    textColor: "text-emerald-700",
+  },
+  تاريخ: {
+    color: "from-amber-500 to-orange-500",
+    bgColor: "from-amber-50 to-orange-50",
+    borderColor: "border-amber-200",
+    icon: GraduationCap,
+    textColor: "text-amber-700",
+  },
+  إنجليزية: {
+    color: "from-indigo-500 to-blue-500",
+    bgColor: "from-indigo-50 to-blue-50",
+    borderColor: "border-indigo-200",
+    icon: GraduationCap,
+    textColor: "text-indigo-700",
+  },
+};
+
+// Default style for unknown modules
+const defaultStyle = {
+  color: "from-gray-500 to-slate-500",
+  bgColor: "from-gray-50 to-slate-50",
+  borderColor: "border-gray-200",
+  icon: GraduationCap,
+  textColor: "text-gray-700",
+};
+
+// Helper function to get module style
+const getModuleStyle = (moduleName) => {
+  return moduleStyles[moduleName] || defaultStyle;
+};
+
+// Helper function to format time slots
+const formatTimeSlot = (slot) => {
+  const timeMap = {
+    "08:00": "8-10",
+    "10:00": "10-12",
+    "14:00": "14-16",
+  };
+  return timeMap[slot] || slot;
+};
 
 // Enhanced styled components matching the main page design
 const StyledContainer = styled.div`
@@ -213,15 +283,31 @@ const LanguageButton = styled(Button)`
   }
 `;
 
+// Day mapping
+const dayMap = {
+  d1: "Sunday",
+  d2: "Monday",
+  d3: "Tuesday",
+  d4: "Wednesday",
+  d5: "Thursday",
+};
+
+// Time slots to show in order
+const timeSlots = ["08:00", "10:00", "14:00"];
+const dayOrder = ["d1", "d2", "d3", "d4", "d5"];
+
+const getDayFromSlot = (slot) => slot.slice(0, 2);
+const getTimeFromSlot = (slot) => slot.slice(2);
+
 export default function ParentSchedule({ user }) {
-  const [language, setLanguage] = useState("ar"); // Default: Arabic
-  const [selectedChild, setSelectedChild] = useState("s1"); // Default: Amina
+  const [language, setLanguage] = useState("ar");
+  const [selectedChild, setSelectedChild] = useState("s1");
   const [isLoading, setIsLoading] = useState(true);
 
   // Hardcoded students
   const students = [
-    { id: "s1", first_name: "Amina", last_name: "Bouchama", groupId: "1" }, // Group 3أ
-    { id: "s2", first_name: "Youssef", last_name: "Bouchama", groupId: "2" }, // Group 3ب
+    { id: "s1", first_name: "Amina", last_name: "Bouchama", groupId: "1" },
+    { id: "s2", first_name: "Youssef", last_name: "Bouchama", groupId: "2" },
   ];
 
   // Hardcoded groups
@@ -533,6 +619,53 @@ export default function ParentSchedule({ user }) {
     },
   };
 
+  // Convert existing timetable data to the new format
+  const buildScheduleMatrix = () => {
+    const matrix = {};
+
+    timeSlots.forEach((slot) => {
+      matrix[slot] = {};
+      dayOrder.forEach((day) => {
+        matrix[slot][day] = null;
+      });
+    });
+
+    // Convert the existing timetable data
+    Object.keys(timetables).forEach((groupId) => {
+      Object.keys(timetables[groupId]).forEach((dayKey) => {
+        const arabicDayMap = {
+          الأحد: "d1",
+          الإثنين: "d2",
+          الثلاثاء: "d3",
+          الأربعاء: "d4",
+          الخميس: "d5",
+        };
+
+        const englishDay = arabicDayMap[dayKey];
+        if (englishDay) {
+          Object.keys(timetables[groupId][dayKey]).forEach((timeSlot) => {
+            const session = timetables[groupId][dayKey][timeSlot];
+            if (
+              session &&
+              matrix[timeSlot] &&
+              matrix[timeSlot][englishDay] === null
+            ) {
+              matrix[timeSlot][englishDay] = {
+                ...session,
+                time_slot: `${englishDay}${timeSlot}`,
+                weeks: "1-8",
+              };
+            }
+          });
+        }
+      });
+    });
+
+    return matrix;
+  };
+
+  const scheduleMatrix = buildScheduleMatrix();
+
   // Translations
   const translations = {
     ar: {
@@ -575,16 +708,7 @@ export default function ParentSchedule({ user }) {
     },
   };
 
-  const hours = [
-    "08:00",
-    "09:00",
-    "10:00",
-    "11:00",
-    "13:00",
-    "14:00",
-    "15:00",
-    "16:00",
-  ];
+  const hours = ["08:00", "10:00", "14:00"];
 
   // Subject colors
   const subjectColors = {
@@ -642,9 +766,7 @@ export default function ParentSchedule({ user }) {
                 `${child?.first_name} ${child?.last_name}`
               )}
             </PageTitle>
-            <PageSubtitle>
-              Consultez l'emploi du temps de votre enfant
-            </PageSubtitle>
+            <PageSubtitle>View your child's weekly class schedule</PageSubtitle>
           </div>
         </StyledHeader>
 
@@ -672,67 +794,261 @@ export default function ParentSchedule({ user }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <EnhancedCard>
-            <CardHeader>
-              <CardTitle className="text-slate-800 flex items-center gap-2">
-                <Calendar className="w-6 h-6 text-slate-600" />
-                {translations[language].cardTitle} - {groupName}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                {translations[language].days.map((day, dayIndex) => (
-                  <motion.div
-                    key={day}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: dayIndex * 0.1 }}
-                  >
-                    <DayHeader>{day}</DayHeader>
-                    <div className="space-y-2">
-                      {hours.map((hour) => {
-                        const session =
-                          timetables[groupId]?.[
-                            translations.ar.days[dayIndex]
-                          ]?.[hour];
-                        return (
-                          <div key={hour}>
-                            <TimeSlot>{hour}</TimeSlot>
-                            {session ? (
-                              <SubjectCard
-                                className={
-                                  subjectColors[session.subject] ||
-                                  "bg-slate-500"
-                                }
-                              >
-                                <SubjectTitle>
-                                  {
-                                    translations[language].subjects[
-                                      session.subject
-                                    ]
-                                  }
-                                </SubjectTitle>
-                                <SubjectTeacher>
-                                  {session.teacher}
-                                </SubjectTeacher>
-                                <SubjectRoom>{session.room}</SubjectRoom>
-                              </SubjectCard>
-                            ) : (
-                              <SubjectCard className="empty">
-                                <p className="text-slate-400 text-center text-sm">
-                                  {translations[language].noSession}
-                                </p>
-                              </SubjectCard>
-                            )}
-                          </div>
-                        );
-                      })}
+          <div className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden mb-8">
+            <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100">
+              <div className="flex bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200 min-w-[828px] sm:min-w-[932px] lg:min-w-[1036px] xl:min-w-[1140px] 2xl:min-w-[1240px]">
+                <div className="p-3 sm:p-4 lg:p-5 xl:p-6 flex items-center justify-center sticky left-0 bg-gradient-to-r from-slate-100 to-gray-100 z-10 border-r-2 border-gray-300 w-28 sm:w-32 lg:w-36 xl:w-40 flex-shrink-0">
+                  <div className="flex items-center gap-2 lg:gap-3">
+                    <div className="p-1.5 sm:p-2 lg:p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full">
+                      <Clock className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-white" />
                     </div>
-                  </motion.div>
+                    <span className="font-bold text-gray-800 text-sm sm:text-base lg:text-lg">
+                      Time
+                    </span>
+                  </div>
+                </div>
+                {dayOrder.map((dayKey) => (
+                  <div
+                    key={dayKey}
+                    className="p-3 sm:p-4 lg:p-5 xl:p-6 text-center border-l border-gray-200 w-[160px] sm:w-[180px] lg:w-[200px] xl:w-[220px] 2xl:w-[240px] flex-shrink-0"
+                  >
+                    <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                      <div className="p-1.5 sm:p-2 lg:p-2.5 xl:p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
+                        <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 xl:w-5 xl:h-5 text-white" />
+                      </div>
+                      <span className="font-bold text-gray-800 text-sm sm:text-base lg:text-lg">
+                        {dayMap[dayKey]}
+                      </span>
+                      <span className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium">
+                        {dayKey === "d1" && "🌅 Morning"}
+                        {dayKey === "d2" && "📚 Learning"}
+                        {dayKey === "d3" && "🔬 Science"}
+                        {dayKey === "d4" && "📖 Study"}
+                        {dayKey === "d5" && "🎯 Focus"}
+                      </span>
+                    </div>
+                  </div>
                 ))}
               </div>
-            </CardContent>
-          </EnhancedCard>
+
+              {/* Schedule Rows with Horizontal Scrolling */}
+              {timeSlots.map((slot, index) => (
+                <div
+                  key={slot}
+                  className={`flex border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-all duration-300 min-w-[828px] sm:min-w-[932px] lg:min-w-[1036px] xl:min-w-[1140px] 2xl:min-w-[1240px] ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                  }`}
+                >
+                  {/* Time Cell - Fixed */}
+                  <div className="p-3 sm:p-4 lg:p-5 xl:p-6 flex items-center justify-center border-r-2 border-gray-300 sticky left-0 bg-inherit z-10 w-28 sm:w-32 lg:w-36 xl:w-40 flex-shrink-0">
+                    <div className="text-center">
+                      <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-0.5 sm:mb-1">
+                        {formatTimeSlot(slot)}
+                      </div>
+                      <div className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium">
+                        {slot === "08:00" && "Morning Session"}
+                        {slot === "10:00" && "Mid Morning"}
+                        {slot === "14:00" && "Afternoon Session"}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Day Cells - Scrollable */}
+                  {dayOrder.map((dayKey) => {
+                    const session = scheduleMatrix[slot][dayKey];
+                    const moduleStyle = session
+                      ? getModuleStyle(session.subject)
+                      : null;
+                    const IconComponent = session ? moduleStyle.icon : null;
+
+                    return (
+                      <div
+                        key={dayKey}
+                        className="border-l border-gray-200 w-[160px] sm:w-[180px] lg:w-[200px] xl:w-[220px] 2xl:w-[240px] h-[140px] sm:h-[150px] lg:h-[160px] xl:h-[170px] 2xl:h-[180px] flex-shrink-0 flex items-stretch"
+                      >
+                        {session ? (
+                          <div
+                            className={`relative w-full h-full bg-gradient-to-br ${moduleStyle.bgColor} ${moduleStyle.borderColor} border-2 rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-4 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer group overflow-hidden flex flex-col`}
+                          >
+                            {/* Module Icon - Absolute positioned */}
+                            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 z-10">
+                              <div
+                                className={`p-1 sm:p-1.5 lg:p-2 bg-gradient-to-r ${moduleStyle.color} rounded-full shadow-lg`}
+                              >
+                                {IconComponent && (
+                                  <IconComponent className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-white" />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Card Content - Flex layout */}
+                            <div className="flex-1 flex flex-col justify-between pr-6 sm:pr-8 lg:pr-10 xl:pr-12">
+                              {/* Module Name */}
+                              <div className="mb-1 sm:mb-1.5 lg:mb-2">
+                                <h3
+                                  className={`font-bold text-xs sm:text-sm lg:text-base xl:text-lg ${moduleStyle.textColor} leading-tight line-clamp-2`}
+                                >
+                                  {session.subject}
+                                </h3>
+                              </div>
+
+                              {/* Teacher Info */}
+                              <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                                <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-gray-500 flex-shrink-0" />
+                                <span className="text-xs sm:text-xs lg:text-sm font-medium text-gray-700 truncate">
+                                  {session.teacher}
+                                </span>
+                              </div>
+
+                              {/* Location */}
+                              <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 mb-2 sm:mb-2.5 lg:mb-3">
+                                <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-gray-500 flex-shrink-0" />
+                                <span className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium truncate">
+                                  {session.room}
+                                </span>
+                              </div>
+
+                              {/* Week Badge - Bottom aligned */}
+                              <div className="flex justify-between items-center mt-auto">
+                                <span className="text-xs bg-white/80 px-2 py-1 rounded-full font-medium text-gray-600">
+                                  Week {session.weeks}
+                                </span>
+                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                  <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-blue-500" />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-50/50 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 border-gray-100 border-dashed">
+                            <div className="text-center text-gray-400">
+                              <div className="text-xs sm:text-xs lg:text-sm font-medium">
+                                Free Period
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Summary Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6 mb-6 lg:mb-8">
+            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-4 lg:p-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <GraduationCap className="w-8 h-8 lg:w-16 lg:h-16 text-blue-600" />
+                </div>
+                <div className="relative z-10">
+                  <div className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-1 lg:mb-2">
+                    {Object.values(scheduleMatrix).reduce(
+                      (total, daySlots) =>
+                        total +
+                        Object.values(daySlots).filter(
+                          (session) => session !== null
+                        ).length,
+                      0
+                    )}
+                  </div>
+                  <p className="text-gray-700 font-semibold text-sm lg:text-base mb-1">
+                    Total Sessions
+                  </p>
+                  <p className="text-xs lg:text-sm text-gray-600">
+                    Weekly classes
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-4 lg:p-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <User className="w-8 h-8 lg:w-16 lg:h-16 text-purple-600" />
+                </div>
+                <div className="relative z-10">
+                  <div className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-1 lg:mb-2">
+                    {
+                      new Set(
+                        Object.values(scheduleMatrix).flatMap((daySlots) =>
+                          Object.values(daySlots)
+                            .filter((session) => session !== null)
+                            .map((session) => session.teacher)
+                        )
+                      ).size
+                    }
+                  </div>
+                  <p className="text-gray-700 font-semibold text-sm lg:text-base mb-1">
+                    Teachers
+                  </p>
+                  <p className="text-xs lg:text-sm text-gray-600">
+                    Active educators
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-emerald-50 to-teal-50 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-4 lg:p-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <MapPin className="w-8 h-8 lg:w-16 lg:h-16 text-emerald-600" />
+                </div>
+                <div className="relative z-10">
+                  <div className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent mb-1 lg:mb-2">
+                    {
+                      new Set(
+                        Object.values(scheduleMatrix).flatMap((daySlots) =>
+                          Object.values(daySlots)
+                            .filter((session) => session !== null)
+                            .map((session) => session.room)
+                        )
+                      ).size
+                    }
+                  </div>
+                  <p className="text-gray-700 font-semibold text-sm lg:text-base mb-1">
+                    Classrooms
+                  </p>
+                  <p className="text-xs lg:text-sm text-gray-600">
+                    Used this week
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-to-br from-amber-50 to-orange-50 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group">
+              <CardContent className="p-4 lg:p-6 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-2 lg:p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <Calendar className="w-8 h-8 lg:w-16 lg:h-16 text-amber-600" />
+                </div>
+                <div className="relative z-10">
+                  <div className="text-2xl lg:text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent mb-1 lg:mb-2">
+                    {Math.round(
+                      (Object.values(scheduleMatrix).reduce(
+                        (total, daySlots) =>
+                          total +
+                          Object.values(daySlots).filter(
+                            (session) => session !== null
+                          ).length,
+                        0
+                      ) /
+                        40) *
+                        100
+                    )}
+                    %
+                  </div>
+                  <p className="text-gray-700 font-semibold text-sm lg:text-base mb-1">
+                    Utilization
+                  </p>
+                  <p className="text-xs lg:text-sm text-gray-600">
+                    Weekly schedule
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </motion.div>
       </div>
     </StyledContainer>

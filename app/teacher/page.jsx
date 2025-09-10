@@ -290,7 +290,7 @@ export default function Home() {
       id: 1,
       title: "Mid-term Exams Next Week",
       message:
-        "Grade 10 Mathematics and Science exams scheduled for Monday and Wednesday.",
+        "السنة الأولى ثانوي Mathematics and Science exams scheduled for Monday and Wednesday.",
       type: "important",
       date: "2024-01-15",
     },
@@ -318,14 +318,14 @@ export default function Home() {
     avatar: "SJ",
     experience: "8 years",
     department: "Mathematics",
-    nextClass: "Grade 10 Math - 10:00 AM",
+    nextClass: "السنة الأولى ثانوي Math - 10:00 AM",
   };
 
   const recentActivities = [
     {
       id: 1,
       type: "grade",
-      title: "Graded Algebra assignment for Grade 9",
+      title: "Graded Algebra assignment for السنة التاسعة متوسط",
       time: "2 hours ago",
       icon: <TrophyOutlined />,
       color: "#52c41a",

@@ -17,6 +17,7 @@ import {
   Progress,
   Badge,
   Tag,
+  Drawer,
 } from "antd";
 import {
   FilterOutlined,
@@ -33,11 +34,19 @@ import {
   ClockCircleOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
+  MenuOutlined,
+  HomeOutlined,
+  BarChartOutlined,
+  SettingOutlined,
+  TeamOutlined,
+  ScheduleOutlined,
+  FileTextOutlined,
+  LogoutOutlined,
 } from "@ant-design/icons";
 import dynamic from "next/dynamic";
 import { Card as ShadcnCard } from "@/components/ui/card";
 import styled from "styled-components";
-import { GraduationCap } from "lucide-react";
+import { GraduationCap, Menu, X } from "lucide-react";
 
 const Chart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
@@ -55,6 +64,15 @@ const StyledHeader = styled.h1`
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+
+  @media (max-width: 767px) {
+    font-size: 2rem;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.8rem;
+  }
 `;
 
 const ElegantLogo = styled.div`
@@ -62,6 +80,11 @@ const ElegantLogo = styled.div`
   align-items: center;
   gap: 16px;
   margin-bottom: 16px;
+
+  @media (max-width: 767px) {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
 `;
 
 const LogoIcon = styled.div`
@@ -104,6 +127,14 @@ const LogoText = styled.span`
     background: linear-gradient(90deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
     border-radius: 2px;
     opacity: 0.8;
+  }
+
+  @media (max-width: 767px) {
+    font-size: 1.8rem;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.5rem;
   }
 `;
 
@@ -151,12 +182,38 @@ const ActivityCard = styled(ShadcnCard)`
   }
 `;
 
+const AnnouncementCard = styled.div`
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  @media (max-width: 767px) {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+`;
+
 const MasonryGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 24px;
   grid-auto-rows: minmax(250px, auto);
   grid-auto-flow: dense;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    grid-auto-rows: minmax(300px, auto);
+  }
 `;
 
 const MasonryItem = styled(ShadcnCard)`
@@ -182,6 +239,12 @@ const CircularCluster = styled.div`
   justify-content: center;
   gap: 32px;
   position: relative;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
 `;
 
 const CircularCard = styled(ShadcnCard)`
@@ -195,15 +258,137 @@ const CircularCard = styled(ShadcnCard)`
   align-items: center;
   justify-content: center;
   border: 1px solid rgba(255, 255, 255, 0.8);
+
+  @media (max-width: 767px) {
+    width: 280px;
+    height: 280px;
+    padding: 16px;
+  }
+
+  @media (max-width: 480px) {
+    width: 250px;
+    height: 250px;
+    padding: 12px;
+  }
 `;
 
-const AnnouncementCard = styled.div`
+const Sidebar = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 280px;
+  height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
+  padding: 24px;
+  z-index: 1000;
+  transform: translateX(${(props) => (props.isOpen ? "0" : "-100%")});
+  transition: transform 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.15);
+
+  @media (max-width: 768px) {
+    width: 280px; /* Keep fixed width on mobile */
+    max-width: 80vw; /* Don't exceed 80% of viewport width */
+    transform: translateX(${(props) => (props.isOpen ? "0" : "-100%")});
+  }
+
+  @media (max-width: 480px) {
+    width: 260px; /* Slightly smaller on very small screens */
+    max-width: 85vw;
+  }
+`;
+
+const SidebarOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: ${(props) => (props.isOpen ? 1 : 0)};
+  visibility: ${(props) => (props.isOpen ? "visible" : "hidden")};
+  transition: all 0.3s ease;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
+const MainContent = styled.div`
+  margin-left: ${(props) => (props.sidebarOpen ? "280px" : "0")};
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+`;
+
+const SidebarMenuItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: ${(props) =>
+    props.active ? "rgba(255, 255, 255, 0.2)" : "transparent"};
+  min-height: 48px; /* Ensure proper touch target */
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(4px);
+  }
+
+  &:active {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  span {
+    font-size: 16px;
+    font-weight: 500;
+  }
+
+  @media (max-width: 768px) {
+    padding: 16px 18px;
+    min-height: 52px;
+  }
+`;
+
+const MobileHeader = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 12px 16px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
+const MobileMenuButton = styled(Button)`
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+
+  &:hover {
+    background: #5a67d8 !important;
+    transform: scale(1.05);
+  }
+
+  transition: all 0.2s ease;
 `;
 
 const QuickActionGrid = styled.div`
@@ -211,6 +396,12 @@ const QuickActionGrid = styled.div`
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 32px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
+  }
 `;
 
 const QuickActionCard = styled.div`
@@ -240,6 +431,18 @@ const QuickActionCard = styled.div`
     font-size: 0.9rem;
     opacity: 0.9;
   }
+
+  @media (max-width: 767px) {
+    padding: 16px;
+
+    h3 {
+      font-size: 1rem;
+    }
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
 `;
 
 export default function Home() {
@@ -248,6 +451,54 @@ export default function Home() {
   const [timeRange, setTimeRange] = useState(
     searchParams.get("timeRange") || "monthly"
   );
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [activeMenuItem, setActiveMenuItem] = useState("dashboard");
+
+  // Sidebar menu items
+  const sidebarMenuItems = [
+    {
+      key: "dashboard",
+      icon: <HomeOutlined />,
+      label: "Dashboard",
+      path: "/admin",
+    },
+    {
+      key: "students",
+      icon: <TeamOutlined />,
+      label: "Students",
+      path: "/admin/students",
+    },
+    {
+      key: "teachers",
+      icon: <UserOutlined />,
+      label: "Teachers",
+      path: "/admin/teachers",
+    },
+    {
+      key: "schedule",
+      icon: <ScheduleOutlined />,
+      label: "Schedule",
+      path: "/admin/schedule",
+    },
+    {
+      key: "reports",
+      icon: <BarChartOutlined />,
+      label: "Reports",
+      path: "/admin/reports",
+    },
+    {
+      key: "documents",
+      icon: <FileTextOutlined />,
+      label: "Documents",
+      path: "/admin/documents",
+    },
+    {
+      key: "settings",
+      icon: <SettingOutlined />,
+      label: "Settings",
+      path: "/admin/settings",
+    },
+  ];
 
   // Enhanced dummy data for admin dashboard
   const statsData = [
@@ -297,7 +548,7 @@ export default function Home() {
       id: 2,
       title: "New Curriculum Update",
       message:
-        "Mathematics curriculum updated for grades 9-12. Training next week.",
+        "Mathematics curriculum updated for all levels. Training next week.",
       type: "info",
       date: "2024-01-10",
     },
@@ -311,7 +562,7 @@ export default function Home() {
   ];
 
   const adminData = {
-    name: "Dr. Sarah Mitchell",
+    name: "Directeur",
     role: "School Administrator",
     avatar: "SM",
     experience: "12 years",
@@ -323,7 +574,7 @@ export default function Home() {
     {
       id: 1,
       type: "enrollment",
-      title: "New student enrolled in Grade 10",
+      title: "New student enrolled in السنة الأولى ثانوي",
       time: "2 hours ago",
       icon: <UserOutlined />,
       color: "#52c41a",
@@ -455,7 +706,20 @@ export default function Home() {
       animations: { enabled: true },
     },
     xaxis: {
-      categories: ["Grade 9", "Grade 10", "Grade 11", "Grade 12"],
+      categories: [
+        "السنة 1 ابتدائي",
+        "السنة 2 ابتدائي",
+        "السنة 3 ابتدائي",
+        "السنة 4 ابتدائي",
+        "السنة 5 ابتدائي",
+        "السنة 6 متوسط",
+        "السنة 7 متوسط",
+        "السنة 8 متوسط",
+        "السنة 9 متوسط",
+        "السنة 1 ثانوي",
+        "السنة 2 ثانوي",
+        "السنة 3 ثانوي",
+      ],
     },
     colors: ["#667eea"],
     plotOptions: {
@@ -473,7 +737,12 @@ export default function Home() {
     tooltip: { theme: "light", y: { formatter: (val) => `${val} students` } },
     grid: { borderColor: "#e8e8e8" },
   };
-  const barSeries = [{ name: "Students", data: [320, 410, 380, 280] }];
+  const barSeries = [
+    {
+      name: "Students",
+      data: [85, 92, 88, 95, 90, 110, 105, 98, 102, 120, 115, 108],
+    },
+  ];
 
   const donutOptions = {
     chart: {
@@ -559,360 +828,620 @@ export default function Home() {
     router.push(`/admin?timeRange=${value}`);
   };
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleMenuClick = (item) => {
+    setActiveMenuItem(item.key);
+    setSidebarOpen(false); // Close sidebar on mobile after clicking
+    // You can add navigation logic here
+    // router.push(item.path);
+  };
+
+  // Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setSidebarOpen(false);
+      }
+    };
+
+    // Initial check on mount
+    if (typeof window !== "undefined") {
+      handleResize();
+    }
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen && window.innerWidth < 769) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [sidebarOpen]);
+
   return (
     <div
       style={{
-        padding: "24px",
         background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
         minHeight: "100vh",
       }}
     >
-      {/* Header Section */}
-      <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
-        <Col>
-          <ElegantLogo>
-            <LogoIcon>
+      {/* Mobile Header */}
+      <MobileHeader>
+        <MobileMenuButton
+          type="primary"
+          icon={<MenuOutlined />}
+          onClick={toggleSidebar}
+          style={{
+            fontSize: "16px",
+            background: "#667eea",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 12px",
+          }}
+        >
+          Menu
+        </MobileMenuButton>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <GraduationCap size={20} color="#667eea" />
+          <span style={{ fontSize: "18px", fontWeight: "600", color: "#333" }}>
+            Dirassati
+          </span>
+        </div>
+        <div style={{ width: "80px" }} /> {/* Spacer for centering */}
+      </MobileHeader>
+
+      {/* Sidebar Overlay for Mobile */}
+      <SidebarOverlay
+        isOpen={sidebarOpen}
+        onClick={() => setSidebarOpen(false)}
+      />
+
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen}>
+        <div style={{ marginBottom: "32px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              marginBottom: "8px",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
               <GraduationCap size={24} color="#ffffff" />
-            </LogoIcon>
-            <LogoText>Dirassati</LogoText>
-          </ElegantLogo>
-          <StyledHeader>Admin Dashboard</StyledHeader>
-          <p style={{ color: "#666", fontSize: "1.1rem", margin: 0 }}>
-            Welcome back, {adminData.name}! Here's your school overview.
-          </p>
-        </Col>
-        <Col>
-          <Space size="middle">
-            <Select
-              value={timeRange}
-              onChange={handleTimeRangeChange}
-              options={[
-                { value: "daily", label: "Daily" },
-                { value: "weekly", label: "Weekly" },
-                { value: "monthly", label: "Monthly" },
-              ]}
-              style={{ width: 120 }}
-            />
-            <Button icon={<FilterOutlined />}>Filters</Button>
-            <Button icon={<DownloadOutlined />}>Export Report</Button>
-          </Space>
-        </Col>
-      </Row>
-
-      {/* Quick Actions */}
-      <QuickActionGrid>
-        <QuickActionCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
-          <UserOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Manage Students</h3>
-          <p>Add, edit, or remove students</p>
-        </QuickActionCard>
-        <QuickActionCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
-          <TrophyOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Staff Management</h3>
-          <p>Manage teachers and staff</p>
-        </QuickActionCard>
-        <QuickActionCard gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
-          <BookOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Generate Reports</h3>
-          <p>Create detailed analytics</p>
-        </QuickActionCard>
-        <QuickActionCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
-          <CalendarOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
-          <h3>Schedule Events</h3>
-          <p>Plan school activities</p>
-        </QuickActionCard>
-      </QuickActionGrid>
-
-      {/* Key Metrics */}
-      <StyledSection>
-        <StyledSubHeader>
-          <TrophyOutlined /> School Overview
-          <Tooltip title="Key performance indicators for the school">
-            <InfoCircleOutlined style={{ color: "#888" }} />
-          </Tooltip>
-        </StyledSubHeader>
-        <Row gutter={[24, 24]}>
-          {statsData.map((stat) => (
-            <Col xs={24} sm={12} lg={6} key={stat.name}>
-              <MetricCard hoverable>
-                <Statistic
-                  title={
-                    <span
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "8px",
-                      }}
-                    >
-                      {stat.icon}
-                      {stat.name}
-                      <Tooltip title={stat.info}>
-                        <InfoCircleOutlined
-                          style={{ fontSize: "12px", color: "#888" }}
-                        />
-                      </Tooltip>
-                    </span>
-                  }
-                  value={stat.value}
-                  suffix={stat.suffix || stat.change}
-                  valueStyle={{
-                    color: stat.color,
-                    fontSize: "32px",
-                    fontWeight: 700,
-                  }}
-                />
-              </MetricCard>
-            </Col>
-          ))}
-        </Row>
-      </StyledSection>
-
-      {/* Announcements */}
-      <StyledSection>
-        <StyledSubHeader>
-          <BellOutlined /> Important Announcements
-        </StyledSubHeader>
-        {announcements.map((announcement) => (
-          <AnnouncementCard key={announcement.id}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "8px",
-              }}
-            >
-              <h3 style={{ margin: 0, fontSize: "1.1rem", fontWeight: "600" }}>
-                {announcement.title}
-              </h3>
-              <Tag
-                color={
-                  announcement.type === "important"
-                    ? "red"
-                    : announcement.type === "info"
-                    ? "blue"
-                    : "green"
-                }
-              >
-                {announcement.type}
-              </Tag>
+              <span style={{ fontSize: "20px", fontWeight: "700" }}>
+                Dirassati
+              </span>
             </div>
-            <p style={{ margin: 0, opacity: 0.9 }}>{announcement.message}</p>
-            <small style={{ opacity: 0.7 }}>{announcement.date}</small>
-          </AnnouncementCard>
-        ))}
-      </StyledSection>
+            <Button
+              type="text"
+              icon={<X size={20} />}
+              onClick={() => setSidebarOpen(false)}
+              style={{
+                color: "white",
+                border: "none",
+                background: "transparent",
+                display: window.innerWidth < 769 ? "block" : "none",
+              }}
+            />
+          </div>
+          <p
+            style={{
+              color: "rgba(255, 255, 255, 0.8)",
+              fontSize: "14px",
+              margin: 0,
+            }}
+          >
+            School Management System
+          </p>
+        </div>
 
-      {/* Admin Profile */}
-      <StyledSection>
-        <StyledSubHeader>
-          <UserOutlined /> Administrator Profile
-        </StyledSubHeader>
-        <Row gutter={[24, 24]}>
-          <Col xs={24} lg={12}>
-            <ActivityCard>
+        <div>
+          {sidebarMenuItems.map((item) => (
+            <SidebarMenuItem
+              key={item.key}
+              active={activeMenuItem === item.key}
+              onClick={() => handleMenuClick(item)}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+            </SidebarMenuItem>
+          ))}
+        </div>
+
+        <div style={{ marginTop: "auto", paddingTop: "32px" }}>
+          <SidebarMenuItem onClick={() => console.log("Logout")}>
+            <LogoutOutlined />
+            <span>Logout</span>
+          </SidebarMenuItem>
+        </div>
+      </Sidebar>
+
+      {/* Main Content */}
+      <MainContent sidebarOpen={sidebarOpen}>
+        <div
+          style={{
+            padding: window.innerWidth < 768 ? "16px" : "24px",
+            paddingTop: window.innerWidth < 768 ? "80px" : "24px", // Account for mobile header
+            transition: "padding-left 0.3s ease",
+          }}
+        >
+          {/* Header Section */}
+          <Row
+            justify="space-between"
+            align="middle"
+            style={{ marginBottom: window.innerWidth < 768 ? 24 : 32 }}
+          >
+            <Col xs={24} lg={16}>
+              <ElegantLogo>
+                <LogoIcon>
+                  <GraduationCap
+                    size={window.innerWidth < 768 ? 20 : 24}
+                    color="#ffffff"
+                  />
+                </LogoIcon>
+                <LogoText>Dirassati</LogoText>
+              </ElegantLogo>
+              <StyledHeader>Admin Dashboard</StyledHeader>
+              <p
+                style={{
+                  color: "#666",
+                  fontSize: window.innerWidth < 768 ? "1rem" : "1.1rem",
+                  margin: 0,
+                }}
+              >
+                Welcome back, {adminData.name}! Here's your school overview.
+              </p>
+            </Col>
+            <Col xs={24} lg={8}>
               <div
                 style={{
                   display: "flex",
-                  alignItems: "center",
-                  marginBottom: "16px",
+                  justifyContent:
+                    window.innerWidth < 768 ? "center" : "flex-end",
+                  gap: "12px",
+                  flexWrap: "wrap",
                 }}
               >
-                <Avatar
-                  size={64}
+                <Select
+                  value={timeRange}
+                  onChange={handleTimeRangeChange}
+                  options={[
+                    { value: "daily", label: "Daily" },
+                    { value: "weekly", label: "Weekly" },
+                    { value: "monthly", label: "Monthly" },
+                  ]}
+                  style={{ width: window.innerWidth < 768 ? "100%" : 120 }}
+                />
+                <Button
+                  icon={<FilterOutlined />}
+                  style={{ flex: window.innerWidth < 768 ? 1 : "none" }}
+                >
+                  Filters
+                </Button>
+                <Button
+                  icon={<DownloadOutlined />}
+                  style={{ flex: window.innerWidth < 768 ? 1 : "none" }}
+                >
+                  Export Report
+                </Button>
+              </div>
+            </Col>
+          </Row>
+
+          {/* Quick Actions */}
+          <QuickActionGrid>
+            <QuickActionCard gradient="linear-gradient(135deg, #667eea 0%, #764ba2 100%)">
+              <UserOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+              <h3>Manage Students</h3>
+              <p>Add, edit, or remove students</p>
+            </QuickActionCard>
+            <QuickActionCard gradient="linear-gradient(135deg, #f093fb 0%, #f5576c 100%)">
+              <TrophyOutlined
+                style={{ fontSize: "24px", marginBottom: "8px" }}
+              />
+              <h3>Staff Management</h3>
+              <p>Manage teachers and staff</p>
+            </QuickActionCard>
+            <QuickActionCard gradient="linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)">
+              <BookOutlined style={{ fontSize: "24px", marginBottom: "8px" }} />
+              <h3>Generate Reports</h3>
+              <p>Create detailed analytics</p>
+            </QuickActionCard>
+            <QuickActionCard gradient="linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)">
+              <CalendarOutlined
+                style={{ fontSize: "24px", marginBottom: "8px" }}
+              />
+              <h3>Schedule Events</h3>
+              <p>Plan school activities</p>
+            </QuickActionCard>
+          </QuickActionGrid>
+
+          {/* Key Metrics */}
+          <StyledSection>
+            <StyledSubHeader>
+              <TrophyOutlined /> School Overview
+              <Tooltip title="Key performance indicators for the school">
+                <InfoCircleOutlined style={{ color: "#888" }} />
+              </Tooltip>
+            </StyledSubHeader>
+            <Row
+              gutter={[
+                window.innerWidth < 768 ? 16 : 24,
+                window.innerWidth < 768 ? 16 : 24,
+              ]}
+            >
+              {statsData.map((stat) => (
+                <Col xs={24} sm={12} lg={6} key={stat.name}>
+                  <MetricCard hoverable>
+                    <Statistic
+                      title={
+                        <span
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "8px",
+                          }}
+                        >
+                          {stat.icon}
+                          {stat.name}
+                          <Tooltip title={stat.info}>
+                            <InfoCircleOutlined
+                              style={{ fontSize: "12px", color: "#888" }}
+                            />
+                          </Tooltip>
+                        </span>
+                      }
+                      value={stat.value}
+                      suffix={stat.suffix || stat.change}
+                      valueStyle={{
+                        color: stat.color,
+                        fontSize: window.innerWidth < 768 ? "28px" : "32px",
+                        fontWeight: 700,
+                      }}
+                    />
+                  </MetricCard>
+                </Col>
+              ))}
+            </Row>
+          </StyledSection>
+
+          {/* Announcements */}
+          <StyledSection>
+            <StyledSubHeader>
+              <BellOutlined /> Important Announcements
+            </StyledSubHeader>
+            {announcements.map((announcement) => (
+              <AnnouncementCard key={announcement.id}>
+                <div
                   style={{
-                    background: "#667eea",
-                    fontSize: "24px",
-                    fontWeight: "600",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                    flexDirection: window.innerWidth < 768 ? "column" : "row",
+                    alignItems:
+                      window.innerWidth < 768 ? "flex-start" : "center",
+                    gap: window.innerWidth < 768 ? "8px" : "0",
                   }}
                 >
-                  {adminData.avatar}
-                </Avatar>
-                <div style={{ marginLeft: "16px" }}>
                   <h3
                     style={{
                       margin: 0,
-                      fontSize: "1.3rem",
+                      fontSize: window.innerWidth < 768 ? "1rem" : "1.1rem",
                       fontWeight: "600",
                     }}
                   >
-                    {adminData.name}
+                    {announcement.title}
                   </h3>
-                  <p style={{ margin: "4px 0", color: "#666" }}>
-                    {adminData.role}
-                  </p>
-                  <div style={{ display: "flex", gap: "16px" }}>
-                    <span style={{ fontSize: "0.9rem" }}>
-                      <TrophyOutlined
-                        style={{ color: "#fa8c16", marginRight: "4px" }}
-                      />
-                      {adminData.experience} Experience
-                    </span>
-                    <span style={{ fontSize: "0.9rem" }}>
-                      <BookOutlined
-                        style={{ color: "#667eea", marginRight: "4px" }}
-                      />
-                      {adminData.department}
+                  <Tag
+                    color={
+                      announcement.type === "important"
+                        ? "red"
+                        : announcement.type === "info"
+                        ? "blue"
+                        : "green"
+                    }
+                  >
+                    {announcement.type}
+                  </Tag>
+                </div>
+                <p
+                  style={{
+                    margin: 0,
+                    opacity: 0.9,
+                    fontSize: window.innerWidth < 768 ? "0.9rem" : "1rem",
+                  }}
+                >
+                  {announcement.message}
+                </p>
+                <small
+                  style={{
+                    opacity: 0.7,
+                    fontSize: window.innerWidth < 768 ? "0.8rem" : "0.9rem",
+                  }}
+                >
+                  {announcement.date}
+                </small>
+              </AnnouncementCard>
+            ))}
+          </StyledSection>
+
+          {/* Admin Profile */}
+          <StyledSection>
+            <StyledSubHeader>
+              <UserOutlined /> Administrator Profile
+            </StyledSubHeader>
+            <Row
+              gutter={[
+                window.innerWidth < 768 ? 16 : 24,
+                window.innerWidth < 768 ? 16 : 24,
+              ]}
+            >
+              <Col xs={24} lg={12}>
+                <ActivityCard>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      marginBottom: "16px",
+                      flexDirection: window.innerWidth < 768 ? "column" : "row",
+                      textAlign: window.innerWidth < 768 ? "center" : "left",
+                    }}
+                  >
+                    <Avatar
+                      size={window.innerWidth < 768 ? 56 : 64}
+                      style={{
+                        background: "#667eea",
+                        fontSize: window.innerWidth < 768 ? "20px" : "24px",
+                        fontWeight: "600",
+                        marginBottom: window.innerWidth < 768 ? "12px" : "0",
+                      }}
+                    >
+                      {adminData.avatar}
+                    </Avatar>
+                    <div
+                      style={{
+                        marginLeft: window.innerWidth < 768 ? "0" : "16px",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          margin: 0,
+                          fontSize:
+                            window.innerWidth < 768 ? "1.2rem" : "1.3rem",
+                          fontWeight: "600",
+                        }}
+                      >
+                        {adminData.name}
+                      </h3>
+                      <p style={{ margin: "4px 0", color: "#666" }}>
+                        {adminData.role}
+                      </p>
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "16px",
+                          flexDirection:
+                            window.innerWidth < 768 ? "column" : "row",
+                          alignItems:
+                            window.innerWidth < 768 ? "center" : "flex-start",
+                        }}
+                      >
+                        <span style={{ fontSize: "0.9rem" }}>
+                          <TrophyOutlined
+                            style={{ color: "#fa8c16", marginRight: "4px" }}
+                          />
+                          {adminData.experience} Experience
+                        </span>
+                        <span style={{ fontSize: "0.9rem" }}>
+                          <BookOutlined
+                            style={{ color: "#667eea", marginRight: "4px" }}
+                          />
+                          {adminData.department}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      padding: "12px",
+                      background: "#f8f9ff",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <ClockCircleOutlined
+                      style={{ color: "#667eea", marginRight: "8px" }}
+                    />
+                    <span style={{ fontWeight: "500" }}>
+                      Next: {adminData.nextMeeting}
                     </span>
                   </div>
-                </div>
-              </div>
-              <div
-                style={{
-                  padding: "12px",
-                  background: "#f8f9ff",
-                  borderRadius: "8px",
-                }}
-              >
-                <ClockCircleOutlined
-                  style={{ color: "#667eea", marginRight: "8px" }}
+                </ActivityCard>
+              </Col>
+            </Row>
+          </StyledSection>
+
+          {/* Performance Trends */}
+          <StyledSection>
+            <StyledSubHeader>
+              <TrophyOutlined /> School Performance Trends
+              <Tooltip title="Track enrollment and attendance over time">
+                <InfoCircleOutlined style={{ color: "#888" }} />
+              </Tooltip>
+            </StyledSubHeader>
+            <HeroChart>
+              <Chart
+                options={areaOptions}
+                series={areaSeries}
+                type="area"
+                height={window.innerWidth < 768 ? 350 : 450}
+              />
+            </HeroChart>
+          </StyledSection>
+
+          {/* Detailed Analytics */}
+          <StyledSection>
+            <StyledSubHeader>
+              <BookOutlined /> Student Analytics
+              <Tooltip title="Grade distribution and attendance analysis">
+                <InfoCircleOutlined style={{ color: "#888" }} />
+              </Tooltip>
+            </StyledSubHeader>
+            <MasonryGrid>
+              <MasonryItem>
+                <h3
+                  style={{
+                    fontSize: window.innerWidth < 768 ? "1.1rem" : "1.3rem",
+                    marginBottom: "16px",
+                    color: "#333",
+                  }}
+                >
+                  Grade Distribution
+                </h3>
+                <Chart
+                  options={barOptions}
+                  series={barSeries}
+                  type="bar"
+                  height={window.innerWidth < 768 ? 280 : 320}
                 />
-                <span style={{ fontWeight: "500" }}>
-                  Next: {adminData.nextMeeting}
-                </span>
-              </div>
-            </ActivityCard>
-          </Col>
-        </Row>
-      </StyledSection>
+              </MasonryItem>
+              <MasonryItem>
+                <h3
+                  style={{
+                    fontSize: window.innerWidth < 768 ? "1.1rem" : "1.3rem",
+                    marginBottom: "16px",
+                    color: "#333",
+                  }}
+                >
+                  Attendance Breakdown
+                </h3>
+                <Chart
+                  options={donutOptions}
+                  series={donutSeries}
+                  type="donut"
+                  height={window.innerWidth < 768 ? 240 : 280}
+                />
+              </MasonryItem>
+            </MasonryGrid>
+          </StyledSection>
 
-      {/* Performance Trends */}
-      <StyledSection>
-        <StyledSubHeader>
-          <TrophyOutlined /> School Performance Trends
-          <Tooltip title="Track enrollment and attendance over time">
-            <InfoCircleOutlined style={{ color: "#888" }} />
-          </Tooltip>
-        </StyledSubHeader>
-        <HeroChart>
-          <Chart
-            options={areaOptions}
-            series={areaSeries}
-            type="area"
-            height={450}
-          />
-        </HeroChart>
-      </StyledSection>
-
-      {/* Detailed Analytics */}
-      <StyledSection>
-        <StyledSubHeader>
-          <BookOutlined /> Student Analytics
-          <Tooltip title="Grade distribution and attendance analysis">
-            <InfoCircleOutlined style={{ color: "#888" }} />
-          </Tooltip>
-        </StyledSubHeader>
-        <MasonryGrid>
-          <MasonryItem>
-            <h3
-              style={{
-                fontSize: "1.3rem",
-                marginBottom: "16px",
-                color: "#333",
-              }}
-            >
-              Grade Distribution
-            </h3>
-            <Chart
-              options={barOptions}
-              series={barSeries}
-              type="bar"
-              height={320}
-            />
-          </MasonryItem>
-          <MasonryItem>
-            <h3
-              style={{
-                fontSize: "1.3rem",
-                marginBottom: "16px",
-                color: "#333",
-              }}
-            >
-              Attendance Breakdown
-            </h3>
-            <Chart
-              options={donutOptions}
-              series={donutSeries}
-              type="donut"
-              height={280}
-            />
-          </MasonryItem>
-        </MasonryGrid>
-      </StyledSection>
-
-      {/* Recent Activities */}
-      <StyledSection>
-        <StyledSubHeader>
-          <ClockCircleOutlined /> Recent Activities
-        </StyledSubHeader>
-        <ActivityCard>
-          <List
-            dataSource={recentActivities}
-            renderItem={(item) => (
-              <List.Item
-                style={{ padding: "16px 0", borderBottom: "1px solid #f0f0f0" }}
-              >
-                <List.Item.Meta
-                  avatar={
-                    <Avatar
-                      icon={item.icon}
-                      style={{ background: item.color }}
+          {/* Recent Activities */}
+          <StyledSection>
+            <StyledSubHeader>
+              <ClockCircleOutlined /> Recent Activities
+            </StyledSubHeader>
+            <ActivityCard>
+              <List
+                dataSource={recentActivities}
+                renderItem={(item) => (
+                  <List.Item
+                    style={{
+                      padding: window.innerWidth < 768 ? "12px 0" : "16px 0",
+                      borderBottom: "1px solid #f0f0f0",
+                    }}
+                  >
+                    <List.Item.Meta
+                      avatar={
+                        <Avatar
+                          icon={item.icon}
+                          style={{ background: item.color }}
+                        />
+                      }
+                      title={
+                        <span
+                          style={{
+                            fontWeight: "500",
+                            fontSize:
+                              window.innerWidth < 768 ? "0.9rem" : "1rem",
+                          }}
+                        >
+                          {item.title}
+                        </span>
+                      }
+                      description={
+                        <span
+                          style={{
+                            color: "#666",
+                            fontSize:
+                              window.innerWidth < 768 ? "0.8rem" : "0.9rem",
+                          }}
+                        >
+                          {item.time}
+                        </span>
+                      }
                     />
-                  }
-                  title={
-                    <span style={{ fontWeight: "500" }}>{item.title}</span>
-                  }
-                  description={
-                    <span style={{ color: "#666", fontSize: "0.9rem" }}>
-                      {item.time}
-                    </span>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        </ActivityCard>
-      </StyledSection>
+                  </List.Item>
+                )}
+              />
+            </ActivityCard>
+          </StyledSection>
 
-      {/* Activity Heatmap and Performance */}
-      <StyledSection>
-        <StyledSubHeader>
-          <StarOutlined /> Class Activity & School Performance
-          <Tooltip title="Daily class activity and overall school performance">
-            <InfoCircleOutlined style={{ color: "#888" }} />
-          </Tooltip>
-        </StyledSubHeader>
-        <CircularCluster>
-          <CircularCard>
-            <div style={{ textAlign: "center" }}>
-              <h3 style={{ marginBottom: "16px", color: "#333" }}>
-                Class Activity Heatmap
-              </h3>
-              <Chart
-                options={heatmapOptions}
-                series={heatmapSeries}
-                type="heatmap"
-                height={280}
-                width={280}
-              />
-            </div>
-          </CircularCard>
-          <CircularCard>
-            <div style={{ textAlign: "center" }}>
-              <h3 style={{ marginBottom: "16px", color: "#333" }}>
-                School Performance
-              </h3>
-              <Chart
-                options={polarOptions}
-                series={polarSeries}
-                type="polarArea"
-                height={280}
-                width={280}
-              />
-            </div>
-          </CircularCard>
-        </CircularCluster>
-      </StyledSection>
+          {/* Activity Heatmap and Performance */}
+          <StyledSection>
+            <StyledSubHeader>
+              <StarOutlined /> Class Activity & School Performance
+              <Tooltip title="Daily class activity and overall school performance">
+                <InfoCircleOutlined style={{ color: "#888" }} />
+              </Tooltip>
+            </StyledSubHeader>
+            <CircularCluster>
+              <CircularCard>
+                <div style={{ textAlign: "center" }}>
+                  <h3
+                    style={{
+                      marginBottom: "16px",
+                      color: "#333",
+                      fontSize: window.innerWidth < 768 ? "1.1rem" : "1.3rem",
+                    }}
+                  >
+                    Class Activity Heatmap
+                  </h3>
+                  <Chart
+                    options={heatmapOptions}
+                    series={heatmapSeries}
+                    type="heatmap"
+                    height={window.innerWidth < 768 ? 240 : 280}
+                    width={window.innerWidth < 768 ? 240 : 280}
+                  />
+                </div>
+              </CircularCard>
+              <CircularCard>
+                <div style={{ textAlign: "center" }}>
+                  <h3
+                    style={{
+                      marginBottom: "16px",
+                      color: "#333",
+                      fontSize: window.innerWidth < 768 ? "1.1rem" : "1.3rem",
+                    }}
+                  >
+                    School Performance
+                  </h3>
+                  <Chart
+                    options={polarOptions}
+                    series={polarSeries}
+                    type="polarArea"
+                    height={window.innerWidth < 768 ? 240 : 280}
+                    width={window.innerWidth < 768 ? 240 : 280}
+                  />
+                </div>
+              </CircularCard>
+            </CircularCluster>
+          </StyledSection>
+        </div>
+      </MainContent>
     </div>
   );
 }

@@ -11,62 +11,82 @@ import { useDispatch } from "react-redux";
 export default function CompleteChildRegistration() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState(null); 
-  const[tokenLink, setTokenLink] = useState(searchParams.get("token"));
+  const [message, setMessage] = useState(null);
+  const [tokenLink, setTokenLink] = useState(searchParams.get("token"));
   const dispatch = useDispatch();
-     
+
   const handlePasswordSubmit = async (e) => {
     e.preventDefault();
     try {
-    
-   const result= await apiCall("post", "/api/students/complete-child-registration", {
-        token:tokenLink,
-        password:password,
-      });
+      const result = await apiCall(
+        "post",
+        "/api/students/complete-child-registration",
+        {
+          token: tokenLink,
+          password: password,
+        }
+      );
       const access_Token = result.access_token;
       const refresh_Token = result.refresh_token;
 
-       if (result.status === true){ 
-            const Rolle="student";
-            dispatch(setToken({accessToken:access_Token,refreshToken:refresh_Token,role:Rolle})); 
-            router.push("/student")
-            
-          } else {
-            setStatus("Invalid email or password");
-          }
-      
-
-
+      if (result.status === true) {
+        const Rolle = "student";
+        dispatch(
+          setToken({
+            accessToken: access_Token,
+            refreshToken: refresh_Token,
+            role: Rolle,
+          })
+        );
+        router.push("/student");
+      } else {
+        setStatus("Invalid email or password");
+      }
     } catch (error) {
-      setMessage({ type: "error", text: "Failed to complete registration. Please try again." });
+      setMessage({
+        type: "error",
+        text: "Failed to complete registration. Please try again.",
+      });
     }
   };
 
   return (
-    <div style={{alignContent:"center",display:"flex",justifyContent:"center",alignItems:"center",height:"100vh"}}>
-    <div className="p-6 max-w-lg mx-auto" >
-      <h1 className="text-2xl font-bold mb-4">Complete Registration</h1>
-      {message && (
-        <p className={`mb-4 ${message.type === "success" ? "text-green-600" : "text-red-600"}`}>
-          {message.text}
-        </p>
-      )}
-      <form  className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Password</label>
-          <InputFields
-            type="password"
-            placeHolder="Enter your password"
-            inputValue={password}
-            onInputChange={setPassword}
-            required
-          />
-        </div>
-        <AntButton_primary text="Submit" onClick={handlePasswordSubmit} />
-      </form>
-    </div>
+    <div
+      style={{
+        alignContent: "center",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh",
+      }}
+    >
+      <div className="p-6 max-w-lg mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Complete Registration</h1>
+        {message && (
+          <p
+            className={`mb-4 ${
+              message.type === "success" ? "text-green-600" : "text-red-600"
+            }`}
+          >
+            {message.text}
+          </p>
+        )}
+        <form className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Password</label>
+            <InputFields
+              type="password"
+              placeHolder="Enter your password"
+              inputValue={password}
+              onInputChange={setPassword}
+              required
+            />
+          </div>
+          <AntButton_primary text="Submit" onClick={handlePasswordSubmit} />
+        </form>
+      </div>
     </div>
   );
 }

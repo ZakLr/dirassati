@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata = {
-  title: "Dirassati",
-  description: "Private school management platform",
+  title: "Dirassati - Algerian Education Platform",
+  description:
+    "Comprehensive education management platform for Algerian schools and institutions",
 };
 
 export default function RootLayout({ children }) {

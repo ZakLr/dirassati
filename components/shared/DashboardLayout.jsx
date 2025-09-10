@@ -9,6 +9,7 @@ import {
   CalendarOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
+  MenuOutlined,
   BookOutlined,
   CreditCardOutlined,
   ExclamationCircleOutlined,
@@ -35,6 +36,7 @@ import {
   Group,
   Notebook,
   GraduationCap,
+  X,
 } from "lucide-react";
 import { debounce } from "lodash";
 import { useSelector } from "react-redux";
@@ -49,6 +51,59 @@ const StyledLayout = styled(Layout)`
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 `;
 
+// Mobile Header Component
+const MobileHeader = styled.div`
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 8px 16px;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  height: 56px; /* Reduced height for more compact mobile header */
+
+  @media (max-width: 768px) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+`;
+
+const MobileMenuButton = styled(Button)`
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+
+  &:hover {
+    background: #5a67d8 !important;
+    transform: scale(1.05);
+  }
+
+  transition: all 0.2s ease;
+`;
+
+// Sidebar Overlay for Mobile
+const SidebarOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: ${(props) => (props.$isOpen ? 1 : 0)};
+  visibility: ${(props) => (props.$isOpen ? "visible" : "hidden")};
+  transition: all 0.3s ease;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
 const StyledSidebar = styled.aside`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
@@ -56,6 +111,28 @@ const StyledSidebar = styled.aside`
   box-shadow: 0 8px 32px rgba(102, 126, 234, 0.3);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
+  width: ${(props) => (props.$collapsed ? "64px" : "256px")};
+  transform: ${(props) =>
+    props.$collapsed && window.innerWidth < 768
+      ? "translateX(-100%)"
+      : "translateX(0)"};
+
+  @media (max-width: 768px) {
+    width: 280px; /* Keep fixed width on mobile */
+    max-width: 80vw; /* Don't exceed 80% of viewport width */
+    transform: ${(props) =>
+      props.$collapsed ? "translateX(-100%)" : "translateX(0)"};
+  }
+
+  @media (max-width: 480px) {
+    width: 260px; /* Slightly smaller on very small screens */
+    max-width: 85vw;
+  }
 `;
 
 const SidebarHeader = styled.div`
@@ -190,6 +267,11 @@ const NavButton = styled(Button)`
 const StyledMainLayout = styled(Layout)`
   transition: all 0.3s ease;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  margin-left: ${(props) => (props.$collapsed ? "64px" : "256px")};
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
 `;
 
 const StyledHeader = styled.header`
@@ -200,6 +282,11 @@ const StyledHeader = styled.header`
   position: sticky;
   top: 0;
   z-index: 20;
+
+  @media (max-width: 767px) {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+  }
 `;
 
 const HeaderContent = styled.div`
@@ -209,55 +296,129 @@ const HeaderContent = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  @media (max-width: 768px) {
+    padding: 8px 16px;
+    padding-top: 64px; /* Account for reduced mobile header height */
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
 `;
 
 const SearchContainer = styled.div`
   position: relative;
   transition: all 0.3s ease;
+  flex: 1;
+  max-width: 400px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    max-width: none;
+    order: 1;
+  }
+`;
+
+const SearchClearButton = styled(Button)`
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 15;
+  border: none;
+  background: transparent;
+  color: #999;
+  padding: 4px;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #666;
+  }
+
+  @media (max-width: 767px) {
+    right: 12px;
+    min-width: 28px;
+    height: 28px;
+  }
 `;
 
 const StyledInput = styled(Input)`
   padding-left: 40px;
-  width: 280px;
+  width: 100%;
   border-radius: 12px;
   border: 1px solid #e8e8e8;
   background: #ffffff;
   transition: all 0.3s ease;
+  font-size: 14px;
 
   &:focus {
     border-color: #667eea;
     box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+  }
+
+  @media (max-width: 767px) {
+    padding: 12px 16px 12px 40px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    border-radius: 8px;
+    height: 44px; /* Better touch target */
   }
 `;
 
 const HeaderActions = styled.div`
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+
+  @media (max-width: 767px) {
+    justify-content: center;
+    width: 100%;
+    order: 2;
+    gap: 8px;
+  }
 `;
 
 const NotificationButton = styled(Button)`
   position: relative;
   border-radius: 12px;
   transition: all 0.3s ease;
+  min-width: 44px;
+  min-height: 44px;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   }
+
+  @media (max-width: 767px) {
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 8px;
+  }
 `;
 
 const NotificationBadge = styled(Badge)`
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -6px;
+  right: -6px;
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   color: white;
   font-size: 10px;
   font-weight: 600;
   padding: 2px 6px;
   border-radius: 8px;
-  animation: pulse 2s infinite;
+  border: 2px solid white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 767px) {
+    animation: none; /* Remove animation on mobile for better UX */
+    top: -4px;
+    right: -4px;
+    font-size: 9px;
+    padding: 1px 5px;
+  }
 `;
 
 const UserMenuButton = styled(Button)`
@@ -266,10 +427,19 @@ const UserMenuButton = styled(Button)`
   gap: 8px;
   border-radius: 12px;
   transition: all 0.3s ease;
+  min-width: 44px;
+  min-height: 44px;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  @media (max-width: 767px) {
+    min-width: 48px;
+    min-height: 48px;
+    border-radius: 8px;
+    gap: 6px;
   }
 `;
 
@@ -281,6 +451,13 @@ const StyledContent = styled(Content)`
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.05);
   min-height: 280px;
+
+  @media (max-width: 768px) {
+    margin: 16px;
+    padding: 16px;
+    padding-top: 72px; /* Account for reduced mobile header height */
+    border-radius: 12px;
+  }
 `;
 
 const StyledFooter = styled(Footer)`
@@ -296,18 +473,34 @@ const DashboardLayout = ({ children, role = "parent" }) => {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setCollapsed(window.innerWidth < 768);
-      setIsSearchOpen(window.innerWidth >= 768);
+      const isMobile = window.innerWidth < 768;
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
+      setCollapsed(isMobile);
+      setSidebarOpen(false); // Always close mobile sidebar on resize
     };
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Prevent body scroll when sidebar is open on mobile
+  useEffect(() => {
+    if (sidebarOpen && window.innerWidth < 769) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [sidebarOpen]);
 
   const handleSearch = useCallback(
     debounce((value) => {
@@ -316,9 +509,14 @@ const DashboardLayout = ({ children, role = "parent" }) => {
     []
   );
 
-  const toggleSearch = () => {
-    setIsSearchOpen((prev) => !prev);
-    if (!isSearchOpen) setSearchQuery("");
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
+  const handleMenuClick = (item) => {
+    setSidebarOpen(false); // Close sidebar on mobile after clicking
+    // You can add navigation logic here
+    // router.push(item.href);
   };
 
   const handleNotificationClick = () => {
@@ -403,13 +601,7 @@ const DashboardLayout = ({ children, role = "parent" }) => {
             key: "chat-parents",
             icon: <TeamOutlined />,
             label: "Chat with Parents",
-            href: "/teacher/chatparent",
-          },
-          {
-            key: "chat-students",
-            icon: <TeamOutlined />,
-            label: "Chat with Students",
-            href: "/teacher/chatstudent",
+            href: "/teacher/parentProfile",
           },
           {
             key: "schedule",
@@ -427,7 +619,7 @@ const DashboardLayout = ({ children, role = "parent" }) => {
             key: "profile",
             icon: <User />,
             label: "Profile",
-            href: "/teacher/profile",
+            href: "/teacher/me",
           },
         ];
       case "student":
@@ -562,8 +754,40 @@ const DashboardLayout = ({ children, role = "parent" }) => {
 
   return (
     <StyledLayout>
+      {/* Mobile Header */}
+      <MobileHeader>
+        <MobileMenuButton
+          type="primary"
+          icon={<MenuOutlined />}
+          onClick={toggleSidebar}
+          style={{
+            fontSize: "16px",
+            background: "#667eea",
+            border: "none",
+            borderRadius: "8px",
+            padding: "8px 12px",
+          }}
+        >
+          Menu
+        </MobileMenuButton>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <GraduationCap size={20} color="#667eea" />
+          <span style={{ fontSize: "18px", fontWeight: "600", color: "#333" }}>
+            Dirassati
+          </span>
+        </div>
+        <div style={{ width: "80px" }} /> {/* Spacer for centering */}
+      </MobileHeader>
+
+      {/* Sidebar Overlay for Mobile */}
+      <SidebarOverlay
+        $isOpen={sidebarOpen}
+        onClick={() => setSidebarOpen(false)}
+      />
+
       <StyledSidebar
-        className={`${collapsed ? "w-16" : "w-64"} fixed h-full z-10`}
+        $collapsed={collapsed}
+        className={`${collapsed ? "w-16" : "w-64"}`}
       >
         <SidebarHeader>
           {!collapsed && (
@@ -579,14 +803,28 @@ const DashboardLayout = ({ children, role = "parent" }) => {
               <CollapsedLogo>D</CollapsedLogo>
             </CollapsedLogoContainer>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className="text-white hover:bg-white/20 rounded-lg"
-          >
-            {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-          </Button>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setCollapsed(!collapsed)}
+              className="text-white hover:bg-white/20 rounded-lg"
+              style={{ display: window.innerWidth >= 769 ? "block" : "none" }}
+            >
+              {collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
+            </Button>
+            <Button
+              type="text"
+              icon={<X size={20} />}
+              onClick={() => setSidebarOpen(false)}
+              style={{
+                color: "white",
+                border: "none",
+                background: "transparent",
+                display: window.innerWidth < 769 ? "block" : "none",
+              }}
+            />
+          </div>
         </SidebarHeader>
         <StyledNav>
           {menuItems.map((item) => (
@@ -594,6 +832,7 @@ const DashboardLayout = ({ children, role = "parent" }) => {
               <NavButton
                 variant="ghost"
                 className={getSelectedKey() === item.key ? "active" : ""}
+                onClick={() => handleMenuClick(item)}
               >
                 {item.icon}
                 {!collapsed && <span>{item.label}</span>}
@@ -603,33 +842,38 @@ const DashboardLayout = ({ children, role = "parent" }) => {
         </StyledNav>
       </StyledSidebar>
 
-      <StyledMainLayout className={`${collapsed ? "ml-16" : "ml-64"}`}>
+      <StyledMainLayout
+        $collapsed={collapsed}
+        className={`${collapsed ? "ml-16" : "ml-64"}`}
+      >
         <StyledHeader>
           <HeaderContent>
-            <div className="flex items-center gap-4">
-              {isSearchOpen ? (
-                <SearchContainer>
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
-                  <StyledInput
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      handleSearch(e.target.value);
-                    }}
-                    placeholder={getSearchPlaceholder()}
-                  />
-                </SearchContainer>
-              ) : (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSearch}
-                  className="text-gray-600 hover:bg-gray-100 rounded-lg"
-                >
-                  <Search className="w-5 h-5" />
-                </Button>
-              )}
+            {/* Mobile Search - Always visible on mobile */}
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <SearchContainer>
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 z-10" />
+                <StyledInput
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    handleSearch(e.target.value);
+                  }}
+                  placeholder={getSearchPlaceholder()}
+                />
+                {searchQuery && (
+                  <SearchClearButton
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setSearchQuery("")}
+                    className="text-gray-400 hover:text-gray-600"
+                  >
+                    <X className="w-4 h-4" />
+                  </SearchClearButton>
+                )}
+              </SearchContainer>
             </div>
+
+            {/* Header Actions */}
             <HeaderActions>
               <NotificationButton
                 variant="ghost"

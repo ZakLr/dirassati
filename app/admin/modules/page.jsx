@@ -48,7 +48,7 @@ const AdminModulesPage = () => {
       code: "MATH-301",
       description:
         "Comprehensive study of calculus, algebra, and geometry for advanced learners",
-      level: { id: 1, name: "Grade 10" },
+      level: { id: 1, name: "السنة الأولى ثانوي" },
       teacher: "Dr. Sarah Johnson",
       totalStudents: 28,
       enrolledStudents: 25,
@@ -64,7 +64,7 @@ const AdminModulesPage = () => {
       code: "PHYS-201",
       description:
         "Introduction to classical physics, mechanics, and thermodynamics",
-      level: { id: 2, name: "Grade 11" },
+      level: { id: 2, name: "السنة الثانية ثانوي" },
       teacher: "Prof. Ahmed Tazi",
       totalStudents: 32,
       enrolledStudents: 30,
@@ -80,7 +80,7 @@ const AdminModulesPage = () => {
       code: "CHEM-401",
       description:
         "Study of carbon compounds, reactions, and laboratory techniques",
-      level: { id: 1, name: "Grade 10" },
+      level: { id: 1, name: "السنة الأولى ثانوي" },
       teacher: "Dr. Fatima Alaoui",
       totalStudents: 24,
       enrolledStudents: 22,
@@ -96,7 +96,7 @@ const AdminModulesPage = () => {
       code: "ENG-302",
       description:
         "Analysis of classic and contemporary literature, writing skills development",
-      level: { id: 3, name: "Grade 12" },
+      level: { id: 3, name: "السنة الثالثة ثانوي" },
       teacher: "Ms. Leila Mansouri",
       totalStudents: 26,
       enrolledStudents: 26,
@@ -112,7 +112,7 @@ const AdminModulesPage = () => {
       code: "HIST-202",
       description:
         "Comprehensive overview of world civilizations and historical events",
-      level: { id: 2, name: "Grade 11" },
+      level: { id: 2, name: "السنة الثانية ثانوي" },
       teacher: "Mr. Karim Bennani",
       totalStudents: 30,
       enrolledStudents: 28,
@@ -127,7 +127,7 @@ const AdminModulesPage = () => {
       name: "Digital Art & Design",
       code: "ART-301",
       description: "Modern digital art techniques using various software tools",
-      level: { id: 1, name: "Grade 10" },
+      level: { id: 1, name: "السنة الأولى ثانوي" },
       teacher: "Mrs. Amina Bouazza",
       totalStudents: 20,
       enrolledStudents: 18,
@@ -142,7 +142,7 @@ const AdminModulesPage = () => {
       name: "Physical Education",
       code: "PE-101",
       description: "Sports, fitness training, and health education",
-      level: { id: 2, name: "Grade 11" },
+      level: { id: 2, name: "السنة الثانية ثانوي" },
       teacher: "Coach Hassan Alaoui",
       totalStudents: 35,
       enrolledStudents: 0,
@@ -158,7 +158,7 @@ const AdminModulesPage = () => {
       code: "MUS-201",
       description:
         "Fundamentals of music theory, composition, and appreciation",
-      level: { id: 3, name: "Grade 12" },
+      level: { id: 3, name: "السنة الثالثة ثانوي" },
       teacher: "Mr. Youssef Tazi",
       totalStudents: 22,
       enrolledStudents: 20,
@@ -174,7 +174,7 @@ const AdminModulesPage = () => {
       code: "CS-401",
       description:
         "Programming fundamentals, algorithms, and software development",
-      level: { id: 1, name: "Grade 10" },
+      level: { id: 1, name: "السنة الأولى ثانوي" },
       teacher: "Dr. Omar Bennani",
       totalStudents: 28,
       enrolledStudents: 26,
@@ -189,8 +189,8 @@ const AdminModulesPage = () => {
       name: "French Language",
       code: "FREN-202",
       description: "Advanced French language skills, grammar, and conversation",
-      level: { id: 2, name: "Grade 11" },
-      teacher: "Madame Sophie Martin",
+      level: { id: 2, name: "السنة الثانية ثانوي" },
+      teacher: "Madame Nadia Kaci",
       totalStudents: 25,
       enrolledStudents: 23,
       credits: 3,
@@ -451,7 +451,7 @@ const AdminModulesPage = () => {
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <p className="font-medium text-gray-900 dark:text-white">
+                                <p className="font-medium !text-gray-900 dark:text-white">
                                   {row.name}
                                 </p>
                                 <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-1">
@@ -576,7 +576,7 @@ const AdminModulesPage = () => {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">
-                    Grade 10 Modules
+                    السنة الأولى ثانوي
                   </span>
                   <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
                     4
@@ -584,7 +584,7 @@ const AdminModulesPage = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">
-                    Grade 11 Modules
+                    السنة الثانية ثانوي
                   </span>
                   <Badge className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                     3
@@ -592,7 +592,7 @@ const AdminModulesPage = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-600 dark:text-gray-400">
-                    Grade 12 Modules
+                    السنة الثالثة ثانوي
                   </span>
                   <Badge className="bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200">
                     3

@@ -73,20 +73,10 @@ export default function TeacherProfilePage() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const res = await apiCall("GET", "/api/teachers/me", null, { token });
-        const teacher = res.teacher || res;
-
-        setProfile({
-          first_name: teacher.first_name || "",
-          last_name: teacher.last_name || "",
-          email: teacher.email || "",
-          phone_number: teacher.phone_number || "",
-          address: teacher.address || "",
-          profile_picture: teacher.profile_picture || "",
-          archived: teacher.archived || false,
-          created_at: teacher.created_at || "",
-          updated_at: teacher.updated_at || "",
-        });
+        // Simulate API delay and use dummy data
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setProfile(dummyProfile);
+        toast.info("Using demo data - API not available");
       } catch (err) {
         console.warn("API call failed, using dummy data:", err.message);
         // Use dummy data as fallback
@@ -98,7 +88,7 @@ export default function TeacherProfilePage() {
     };
 
     fetchProfile();
-  }, [token]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -569,31 +559,31 @@ export default function TeacherProfilePage() {
                         day: "Monday",
                         time: "9:00 AM - 10:30 AM",
                         subject: "Mathematics",
-                        grade: "Grade 10A",
+                        grade: "السنة الأولى ثانوي A",
                       },
                       {
                         day: "Tuesday",
                         time: "11:00 AM - 12:30 PM",
                         subject: "Physics",
-                        grade: "Grade 11B",
+                        grade: "السنة الثانية ثانوي B",
                       },
                       {
                         day: "Wednesday",
                         time: "2:00 PM - 3:30 PM",
                         subject: "Chemistry",
-                        grade: "Grade 9C",
+                        grade: "السنة التاسعة متوسط C",
                       },
                       {
                         day: "Thursday",
                         time: "10:00 AM - 11:30 AM",
                         subject: "Mathematics",
-                        grade: "Grade 12A",
+                        grade: "السنة الثالثة ثانوي A",
                       },
                       {
                         day: "Friday",
                         time: "1:00 PM - 2:30 PM",
                         subject: "Physics",
-                        grade: "Grade 10B",
+                        grade: "السنة الأولى ثانوي B",
                       },
                     ].map((schedule, index) => (
                       <div

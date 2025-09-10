@@ -8,7 +8,7 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center">
             <h1 className="text-5xl font-bold bg-gradient-to-r from-[#667eea] to-[#764ba2] bg-clip-text text-transparent mb-2">
-              EduManage
+              Dirassati
             </h1>
             <p className="text-gray-600 text-lg">Education Management System</p>
           </div>
@@ -113,7 +113,7 @@ export default function Home() {
               Get Started
             </h3>
             <p className="text-gray-600 mb-6">
-              New to EduManage? Create your account or sign in to access your
+              New to Dirassati? Create your account or sign in to access your
               dashboard.
             </p>
             <div className="space-y-4">
@@ -138,7 +138,7 @@ export default function Home() {
       <footer className="py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
           <p className="text-gray-500">
-            © 2024 EduManage. Empowering Education Through Technology.
+            © 2024 Dirassati. Empowering Education Through Technology.
           </p>
         </div>
       </footer>

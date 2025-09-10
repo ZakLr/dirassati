@@ -535,7 +535,7 @@ export default function Payments() {
                     Total Revenue
                   </p>
                   <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-                    MAD {totalRevenue.toLocaleString()}
+                    DZD {totalRevenue.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {
@@ -560,7 +560,7 @@ export default function Payments() {
                     Pending Payments
                   </p>
                   <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
-                    MAD {pendingAmount.toLocaleString()}
+                    DZD {pendingAmount.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {
@@ -586,7 +586,7 @@ export default function Payments() {
                     Overdue Amount
                   </p>
                   <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-                    MAD {overdueAmount.toLocaleString()}
+                    DZD {overdueAmount.toLocaleString()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {dummyPayments.filter((p) => p.status === "overdue").length}{" "}
@@ -722,7 +722,7 @@ export default function Payments() {
                         </TableCell>
                         <TableCell>
                           <span className="font-semibold text-gray-900 dark:text-white">
-                            MAD {payment.amount.toLocaleString()}
+                            DZD {payment.amount.toLocaleString()}
                           </span>
                         </TableCell>
                         <TableCell>

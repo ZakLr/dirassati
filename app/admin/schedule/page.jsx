@@ -45,7 +45,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 1,
         name: "Mathematics A1",
-        level: { id: 1, name: "Grade 10" },
+        level: { id: 1, name: "السنة الأولى ثانوي" },
       },
       semester: {
         id: 1,
@@ -62,7 +62,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 2,
         name: "Physics B2",
-        level: { id: 2, name: "Grade 11" },
+        level: { id: 2, name: "السنة الثانية ثانوي" },
       },
       semester: {
         id: 1,
@@ -79,7 +79,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 3,
         name: "Chemistry C1",
-        level: { id: 1, name: "Grade 10" },
+        level: { id: 1, name: "السنة الأولى ثانوي" },
       },
       semester: {
         id: 1,
@@ -96,7 +96,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 4,
         name: "English D2",
-        level: { id: 3, name: "Grade 12" },
+        level: { id: 3, name: "السنة الثالثة ثانوي" },
       },
       semester: {
         id: 2,
@@ -113,7 +113,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 5,
         name: "History E1",
-        level: { id: 2, name: "Grade 11" },
+        level: { id: 2, name: "السنة الثانية ثانوي" },
       },
       semester: {
         id: 1,
@@ -130,7 +130,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 6,
         name: "Art F1",
-        level: { id: 1, name: "Grade 10" },
+        level: { id: 1, name: "السنة الأولى ثانوي" },
       },
       semester: {
         id: 1,
@@ -147,7 +147,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 7,
         name: "Sports G2",
-        level: { id: 2, name: "Grade 11" },
+        level: { id: 2, name: "السنة الثانية ثانوي" },
       },
       semester: {
         id: 2,
@@ -164,7 +164,7 @@ const AdminSchedulePage = () => {
       group: {
         id: 8,
         name: "Music H1",
-        level: { id: 3, name: "Grade 12" },
+        level: { id: 3, name: "السنة الثالثة ثانوي" },
       },
       semester: {
         id: 1,
@@ -566,7 +566,7 @@ const AdminSchedulePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-semibold !text-gray-900 dark:text-white mb-4">
                 Today's Sessions
               </h3>
               <div className="space-y-3">
@@ -600,7 +600,7 @@ const AdminSchedulePage = () => {
 
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-semibold !text-gray-900 dark:text-white mb-4">
                 This Week
               </h3>
               <div className="space-y-3">
@@ -634,7 +634,7 @@ const AdminSchedulePage = () => {
 
           <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
             <CardContent className="p-6">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              <h3 className="text-lg font-semibold !text-gray-900 dark:text-white mb-4">
                 Room Utilization
               </h3>
               <div className="space-y-3">

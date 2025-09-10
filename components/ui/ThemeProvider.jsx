@@ -1,6 +1,6 @@
 "use client"; // Ensures it runs on the client side
 
-import { ConfigProvider } from "antd";
+import { ConfigProvider, App } from "antd";
 
 export default function ThemeProvider({ children }) {
   return (
@@ -13,7 +13,7 @@ export default function ThemeProvider({ children }) {
         },
       }}
     >
-      {children}
+      <App>{children}</App>
     </ConfigProvider>
   );
 }

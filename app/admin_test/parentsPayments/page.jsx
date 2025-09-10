@@ -24,25 +24,25 @@ const getParents = () => [
     id: "p1",
     first_name: "Mohammed",
     last_name: "Bouchama",
-    email: "mohammed.bouchama@example.com",
-    phone_number: "+212 600 123 456",
-    address: "123 Avenue Mohammed V, Casablanca, Maroc",
+    email: "mohammed.bouchama@school.dz",
+    phone_number: "+213 5 51 23 45 67",
+    address: "123 Avenue Didouche Mourad, Algiers, Algeria",
   },
   {
     id: "p2",
     first_name: "Fatima",
     last_name: "El Idrissi",
-    email: "fatima.elidrissi@example.com",
-    phone_number: "+212 600 789 012",
-    address: "456 Rue Hassan II, Rabat, Maroc",
+    email: "fatima.elidrissi@school.dz",
+    phone_number: "+213 4 12 34 56 78",
+    address: "456 Rue Larbi Ben M'hidi, Oran, Algeria",
   },
   {
     id: "p3",
     first_name: "Ahmed",
     last_name: "Laarbi",
-    email: "ahmed.laarbi@example.com",
-    phone_number: "+212 600 345 678",
-    address: "789 Boulevard Zerktouni, Marrakech, Maroc",
+    email: "ahmed.laarbi@school.dz",
+    phone_number: "+213 3 12 34 56 78",
+    address: "789 Boulevard Emir Abdelkader, Constantine, Algeria",
   },
 ];
 
@@ -50,8 +50,8 @@ const getPayments = () => [
   {
     id: "pi_3N8v2xK9jL2mPqR",
     parent_id: "p1",
-    amount: 150000, // 1500.00 MAD
-    currency: "MAD",
+    amount: 15000000, // 150000.00 DZD (equivalent to 1500 MAD)
+    currency: "DZD",
     status: "succeeded",
     created: "2025-05-04T09:00:00Z",
     payment_method: { type: "card", brand: "visa", last4: "1234" },
@@ -59,14 +59,14 @@ const getPayments = () => [
     student_ids: ["s1", "s2"],
     invoice_id: "in_1N8v2xK9jL2mPqR",
     frequency: "annual",
-    tax_rate: 20,
+    tax_rate: 19,
     notes: "Paiement des frais annuels pour l'année scolaire 2025-2026.",
   },
   {
     id: "pi_4M7u1wJ8iK1nOpQ",
     parent_id: "p1",
-    amount: 100000, // 1000.00 MAD
-    currency: "MAD",
+    amount: 10000000, // 100000.00 DZD (equivalent to 1000 MAD)
+    currency: "DZD",
     status: "succeeded",
     created: "2025-05-03T14:30:00Z",
     payment_method: { type: "card", brand: "mastercard", last4: "5678" },
@@ -74,14 +74,14 @@ const getPayments = () => [
     student_ids: ["s1"],
     invoice_id: "in_4M7u1wJ8iK1nOpQ",
     frequency: "trimestrial",
-    tax_rate: 20,
+    tax_rate: 19,
     notes: "Paiement trimestriel pour le 2ème trimestre 2025.",
   },
   {
     id: "pi_5L6t0vI7hJ0mNpP",
     parent_id: "p2",
-    amount: 200000, // 2000.00 MAD
-    currency: "MAD",
+    amount: 20000000, // 200000.00 DZD (equivalent to 2000 MAD)
+    currency: "DZD",
     status: "failed",
     created: "2025-05-02T10:15:00Z",
     payment_method: { type: "card", brand: "visa", last4: "1234" },
@@ -89,15 +89,15 @@ const getPayments = () => [
     student_ids: ["s3"],
     invoice_id: "in_5L6t0vI7hJ0mNpP",
     frequency: "monthly",
-    tax_rate: 20,
+    tax_rate: 19,
     notes:
       "Tentative de paiement mensuel pour mai 2025, échouée en raison d'une carte refusée.",
   },
   {
     id: "pi_6K5s9uH6gI9lMoO",
     parent_id: "p3",
-    amount: 80000, // 800.00 MAD
-    currency: "MAD",
+    amount: 8000000, // 80000.00 DZD (equivalent to 800 MAD)
+    currency: "DZD",
     status: "refunded",
     created: "2025-05-01T16:45:00Z",
     payment_method: { type: "card", brand: "visa", last4: "1234" },
@@ -105,7 +105,7 @@ const getPayments = () => [
     student_ids: ["s4"],
     invoice_id: "in_6K5s9uH6gI9lMoO",
     frequency: "annual",
-    tax_rate: 20,
+    tax_rate: 19,
     notes: "Remboursé en raison d'un double paiement détecté.",
   },
 ];
@@ -131,7 +131,7 @@ export default function AdminPayments() {
   const router = useRouter();
 
   const formatAmount = (amount, currency) => {
-    return new Intl.NumberFormat("fr-FR", {
+    return new Intl.NumberFormat("ar-DZ", {
       style: "currency",
       currency,
     }).format(amount / 100);
@@ -207,27 +207,27 @@ export default function AdminPayments() {
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Téléphone", dataIndex: "phone_number", key: "phone_number" },
     {
-      title: "Total payé",
+      title: "Total payé (DZD)",
       key: "total_paid",
       render: (_, record) => {
         const summary = getParentPaymentSummary(record.id);
-        return formatAmount(summary.total_paid, "MAD");
+        return formatAmount(summary.total_paid, "DZD");
       },
     },
     {
-      title: "Total en attente",
+      title: "Total en attente (DZD)",
       key: "total_pending",
       render: (_, record) => {
         const summary = getParentPaymentSummary(record.id);
-        return formatAmount(summary.total_pending, "MAD");
+        return formatAmount(summary.total_pending, "DZD");
       },
     },
     {
-      title: "Total remboursé",
+      title: "Total remboursé (DZD)",
       key: "total_refunded",
       render: (_, record) => {
         const summary = getParentPaymentSummary(record.id);
-        return formatAmount(summary.total_refunded, "MAD");
+        return formatAmount(summary.total_refunded, "DZD");
       },
     },
     {

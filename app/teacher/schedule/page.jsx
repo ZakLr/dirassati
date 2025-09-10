@@ -2,47 +2,47 @@
 
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import apiCall from "../../../components/utils/apiCall";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button as ShadcnButton } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   Calendar,
-  Card,
-  Select,
-  Spin,
-  Alert,
-  message,
-  Tag,
-  Row,
-  Col,
-  Button,
-} from "antd";
-import {
-  ClockCircleOutlined,
-  EnvironmentOutlined,
-  UserOutlined,
-  FilterOutlined,
-  DownloadOutlined,
-  InfoCircleOutlined,
-  BookOpen,
+  Clock,
   Users,
-  CalendarOutlined,
-} from "@ant-design/icons";
+  BookOpen,
+  Plus,
+  Eye,
+  Edit,
+  GraduationCap,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  UserCheck,
+  BarChart3,
+  CalendarDays,
+  MapPin,
+  User,
+  Timer,
+  Award,
+} from "lucide-react";
+import { toast } from "sonner";
 import styled from "styled-components";
-import { GraduationCap } from "lucide-react";
 
-const StyledSection = styled.div`
-  margin-bottom: 32px;
-  position: relative;
-`;
-
-const StyledHeader = styled.h1`
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 24px;
-  color: #1a1a1a;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+// Styled components for enhanced design
+const StyledContainer = styled.div`
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 20px;
 `;
 
 const ElegantLogo = styled.div`
@@ -95,567 +95,1060 @@ const LogoText = styled.span`
   }
 `;
 
-const StyledSubHeader = styled.h2`
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-bottom: 20px;
-  color: #333;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+const PageTitle = styled.h1`
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
 `;
 
-const ScheduleCard = styled(Card)`
+const PageSubtitle = styled.p`
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+`;
+
+const EnhancedCard = styled(Card)`
   border-radius: 16px;
-  border: 1px solid #e8e8e8;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  background: linear-gradient(135deg, #ffffff 0%, #fefefe 100%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
   transition: all 0.3s ease;
-  background: linear-gradient(135deg, #ffffff 0%, #fafbff 100%);
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
   }
 `;
 
-const LessonCard = styled.div`
-  background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-  border: 1px solid #e8e8e8;
+const SubjectCard = styled.div`
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
   border-radius: 12px;
   padding: 16px;
-  margin-bottom: 8px;
+  margin: 4px;
+  border: 1px solid #e8e8e8;
   transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  &.empty {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px dashed #dee2e6;
   }
 `;
 
-const HeaderActions = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 16px;
+const SubjectTitle = styled.p`
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: #1a1a1a;
 `;
 
-const QuickStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+const SubjectGroup = styled.p`
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 2px;
 `;
 
-const StatCard = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px;
-  border-radius: 12px;
-  text-align: center;
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.3);
-
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.5rem;
-    font-weight: 700;
-  }
-
-  p {
-    margin: 0;
-    font-size: 0.9rem;
-    opacity: 0.9;
-  }
+const SubjectRoom = styled.p`
+  font-size: 11px;
+  color: #888;
 `;
 
-const FiltersSection = styled.div`
+const TimeSlot = styled.div`
+  font-weight: 600;
+  color: #1a1a1a;
+  padding: 8px;
   background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
-  padding: 24px;
-  border-radius: 12px;
-  margin-bottom: 24px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  text-align: center;
   border: 1px solid #e8e8e8;
 `;
 
-export default function TeacherSchedule() {
-  const userId = useSelector((state) => state.auth.userId);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [schedule, setSchedule] = useState([]);
-  const [modules, setModules] = useState([]);
-  const [selectedModule, setSelectedModule] = useState(null);
+const DayHeader = styled.div`
+  font-weight: 700;
+  color: #1a1a1a;
+  padding: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+`;
 
-  // Dummy data for teacher schedule
-  const dummySchedule = [
+// Day mapping
+const dayMap = {
+  d1: "Sunday",
+  d2: "Monday",
+  d3: "Tuesday",
+  d4: "Wednesday",
+  d5: "Thursday",
+};
+
+// Time slots to show in order
+const timeSlots = ["08:00", "10:00", "14:00"];
+const dayOrder = ["d1", "d2", "d3", "d4", "d5"];
+
+const getDayFromSlot = (slot) => slot.slice(0, 2);
+const getTimeFromSlot = (slot) => slot.slice(2);
+
+// Helper function to format time slots
+const formatTimeSlot = (slot) => {
+  const timeMap = {
+    "08:00": "8-10",
+    "10:00": "10-12",
+    "14:00": "14-16",
+  };
+  return timeMap[slot] || slot;
+};
+
+export default function TeacherSchedulePage() {
+  const userId = useSelector((state) => state.auth.userId);
+  const [loading, setLoading] = useState(false);
+  const [scheduleData, setScheduleData] = useState([]);
+  const [selectedView, setSelectedView] = useState("calendar");
+
+  // Enhanced dummy data for teacher schedule
+  const dummyScheduleData = [
     {
       id: 1,
-      date: "2024-09-16",
       subject: "Mathematics",
-      module: "Algebra",
-      start_time: "08:00:00",
-      end_time: "09:30:00",
+      group: {
+        id: 1,
+        name: "Math A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 28,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
       room: "Room 101",
-      group_name: "Group A",
-      type: "lecture",
+      time: "08:00",
+      day: "d1",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 25, absent: 3, total: 28 },
     },
     {
       id: 2,
-      date: "2024-09-16",
-      subject: "English",
-      module: "Literature",
-      start_time: "10:00:00",
-      end_time: "11:30:00",
-      room: "Room 203",
-      group_name: "Group B",
-      type: "lecture",
+      subject: "Mathematics",
+      group: {
+        id: 2,
+        name: "Math B2",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 26,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 102",
+      time: "10:00",
+      day: "d1",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 24, absent: 2, total: 26 },
     },
     {
       id: 3,
-      date: "2024-09-16",
-      subject: "Science",
-      module: "Physics",
-      start_time: "13:00:00",
-      end_time: "14:30:00",
+      subject: "Physics",
+      group: {
+        id: 3,
+        name: "Physics A1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 24,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
       room: "Lab 1",
-      group_name: "Group A",
-      type: "lab",
+      time: "14:00",
+      day: "d1",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 22, absent: 2, total: 24 },
     },
     {
       id: 4,
-      date: "2024-09-17",
-      subject: "History",
-      module: "World History",
-      start_time: "09:00:00",
-      end_time: "10:30:00",
-      room: "Room 105",
-      group_name: "Group C",
-      type: "lecture",
+      subject: "Mathematics",
+      group: {
+        id: 1,
+        name: "Math A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 28,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 101",
+      time: "08:00",
+      day: "d2",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 26, absent: 2, total: 28 },
     },
     {
       id: 5,
-      date: "2024-09-17",
-      subject: "Art",
-      module: "Drawing",
-      start_time: "11:00:00",
-      end_time: "12:30:00",
-      room: "Art Studio",
-      group_name: "Group B",
-      type: "practical",
+      subject: "Chemistry",
+      group: {
+        id: 4,
+        name: "Chemistry B1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 22,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Lab 2",
+      time: "10:00",
+      day: "d2",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 20, absent: 2, total: 22 },
     },
     {
       id: 6,
-      date: "2024-09-18",
-      subject: "Computer Science",
-      module: "Programming",
-      start_time: "08:00:00",
-      end_time: "09:30:00",
-      room: "Computer Lab",
-      group_name: "Group A",
-      type: "lab",
+      subject: "Mathematics",
+      group: {
+        id: 2,
+        name: "Math B2",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 26,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 102",
+      time: "14:00",
+      day: "d2",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 23, absent: 3, total: 26 },
     },
     {
       id: 7,
-      date: "2024-09-18",
-      subject: "Mathematics",
-      module: "Geometry",
-      start_time: "10:00:00",
-      end_time: "11:30:00",
-      room: "Room 101",
-      group_name: "Group A",
-      type: "lecture",
+      subject: "Physics",
+      group: {
+        id: 3,
+        name: "Physics A1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 24,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Lab 1",
+      time: "08:00",
+      day: "d3",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 21, absent: 3, total: 24 },
     },
     {
       id: 8,
-      date: "2024-09-19",
-      subject: "English",
-      module: "Grammar",
-      start_time: "13:00:00",
-      end_time: "14:30:00",
-      room: "Room 203",
-      group_name: "Group C",
-      type: "lecture",
+      subject: "Mathematics",
+      group: {
+        id: 1,
+        name: "Math A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 28,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 101",
+      time: "10:00",
+      day: "d3",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 27, absent: 1, total: 28 },
     },
     {
       id: 9,
-      date: "2024-09-19",
-      subject: "Physical Education",
-      module: "Sports",
-      start_time: "15:00:00",
-      end_time: "16:30:00",
-      room: "Gym",
-      group_name: "Group B",
-      type: "practical",
+      subject: "English",
+      group: {
+        id: 5,
+        name: "English A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 30,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 203",
+      time: "14:00",
+      day: "d3",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 28, absent: 2, total: 30 },
+    },
+    {
+      id: 10,
+      subject: "Chemistry",
+      group: {
+        id: 4,
+        name: "Chemistry B1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 22,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Lab 2",
+      time: "08:00",
+      day: "d4",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 19, absent: 3, total: 22 },
+    },
+    {
+      id: 11,
+      subject: "Physics",
+      group: {
+        id: 3,
+        name: "Physics A1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 24,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Lab 1",
+      time: "10:00",
+      day: "d4",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 22, absent: 2, total: 24 },
+    },
+    {
+      id: 12,
+      subject: "Mathematics",
+      group: {
+        id: 2,
+        name: "Math B2",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 26,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 102",
+      time: "14:00",
+      day: "d4",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 24, absent: 2, total: 26 },
+    },
+    {
+      id: 13,
+      subject: "English",
+      group: {
+        id: 5,
+        name: "English A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 30,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 203",
+      time: "08:00",
+      day: "d5",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 29, absent: 1, total: 30 },
+    },
+    {
+      id: 14,
+      subject: "Mathematics",
+      group: {
+        id: 1,
+        name: "Math A1",
+        level: { id: 1, name: "Grade 10" },
+        studentCount: 28,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Room 101",
+      time: "10:00",
+      day: "d5",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 26, absent: 2, total: 28 },
+    },
+    {
+      id: 15,
+      subject: "Chemistry",
+      group: {
+        id: 4,
+        name: "Chemistry B1",
+        level: { id: 2, name: "Grade 11" },
+        studentCount: 22,
+      },
+      semester: {
+        id: 1,
+        name: "First Trimester 2024",
+      },
+      room: "Lab 2",
+      time: "14:00",
+      day: "d5",
+      duration: 120,
+      status: "scheduled",
+      attendance: { present: 21, absent: 1, total: 22 },
     },
   ];
 
-  // Dummy data for modules
-  const dummyModules = [
-    { id: 1, name: "Mathematics - Algebra", subject: "Mathematics" },
-    { id: 2, name: "English - Literature", subject: "English" },
-    { id: 3, name: "Science - Physics", subject: "Science" },
-    { id: 4, name: "History - World History", subject: "History" },
-    {
-      id: 5,
-      name: "Computer Science - Programming",
-      subject: "Computer Science",
-    },
-    { id: 6, name: "Art - Drawing", subject: "Art" },
-    {
-      id: 7,
-      name: "Physical Education - Sports",
-      subject: "Physical Education",
-    },
-  ];
+  // Build schedule matrix for calendar view
+  const buildScheduleMatrix = () => {
+    const matrix = {};
+
+    timeSlots.forEach((slot) => {
+      matrix[slot] = {};
+      dayOrder.forEach((day) => {
+        matrix[slot][day] = null;
+      });
+    });
+
+    scheduleData.forEach((session) => {
+      if (matrix[session.time] && matrix[session.time][session.day] === null) {
+        matrix[session.time][session.day] = session;
+      }
+    });
+
+    return matrix;
+  };
+
+  const scheduleMatrix = buildScheduleMatrix();
 
   useEffect(() => {
-    const fetchScheduleData = async () => {
+    const loadData = async () => {
+      setLoading(true);
       try {
-        setLoading(true);
-
-        // Try to fetch real data first
-        const teacherResponse = await apiCall("get", `/api/teachers/${userId}`);
-        const teacherModules = await apiCall(
-          "get",
-          `/api/teachers/${userId}/modules`
-        );
-
-        setModules(teacherModules);
-        setSelectedModule(teacherModules[0]?.id || null);
-
-        const scheduleResponse = await apiCall(
-          "get",
-          `/api/teachers/${userId}/schedule`
-        );
-        setSchedule(scheduleResponse);
-
-        setLoading(false);
+        // Try to fetch from API
+        // For now, using dummy data
+        setScheduleData(dummyScheduleData);
       } catch (err) {
-        // Use dummy data as fallback
-        message.warning("Failed to load schedule - Using demo data");
-        setModules(dummyModules);
-        setSelectedModule(1);
-        setSchedule(dummySchedule);
+        console.warn("API call failed, using dummy data:", err.message);
+        toast.info("Using demo data - API not available");
+        setScheduleData(dummyScheduleData);
+      } finally {
         setLoading(false);
       }
     };
 
-    if (userId) {
-      fetchScheduleData();
-    } else {
-      // Use dummy data when no user
-      setModules(dummyModules);
-      setSelectedModule(1);
-      setSchedule(dummySchedule);
-      setLoading(false);
-    }
+    loadData();
   }, [userId]);
 
-  const handleModuleChange = async (moduleId) => {
-    try {
-      setLoading(true);
-      setSelectedModule(moduleId);
-      const response = await apiCall(
-        "get",
-        `/api/modules/${moduleId}/schedule`
-      );
-      setSchedule(response);
-      setLoading(false);
-    } catch (err) {
-      // Use dummy data as fallback
-      message.warning(
-        "Failed to load schedule for selected module - Using demo data"
-      );
-      const filteredSchedule = dummySchedule.filter(
-        (lesson) =>
-          dummyModules.find((m) => m.id === moduleId)?.subject ===
-          lesson.subject
-      );
-      setSchedule(filteredSchedule);
-      setLoading(false);
-    }
-  };
-
-  // Calculate schedule statistics
-  const getScheduleStats = () => {
-    const today = new Date();
-    const thisWeek = schedule.filter((lesson) => {
-      const lessonDate = new Date(lesson.date);
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - today.getDay());
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-      return lessonDate >= weekStart && lessonDate <= weekEnd;
-    });
-
-    const uniqueSubjects = [
-      ...new Set(schedule.map((lesson) => lesson.subject)),
-    ];
-    const totalHours = schedule.reduce((total, lesson) => {
-      const start = new Date(`2000-01-01T${lesson.start_time}`);
-      const end = new Date(`2000-01-01T${lesson.end_time}`);
-      return total + (end - start) / (1000 * 60 * 60);
-    }, 0);
+  // Calculate statistics
+  const calculateStats = () => {
+    const totalSessions = scheduleData.length;
+    const uniqueSubjects = new Set(scheduleData.map((s) => s.subject)).size;
+    const uniqueGroups = new Set(scheduleData.map((s) => s.group.id)).size;
+    const totalStudents = scheduleData.reduce(
+      (sum, s) => sum + s.group.studentCount,
+      0
+    );
+    const avgAttendance =
+      scheduleData.length > 0
+        ? Math.round(
+            scheduleData.reduce(
+              (sum, s) =>
+                sum + (s.attendance.present / s.attendance.total) * 100,
+              0
+            ) / scheduleData.length
+          )
+        : 0;
 
     return {
-      thisWeek: thisWeek.length,
-      totalSubjects: uniqueSubjects.length,
-      totalHours: Math.round(totalHours * 10) / 10,
+      totalSessions,
+      uniqueSubjects,
+      uniqueGroups,
+      totalStudents,
+      avgAttendance,
     };
   };
 
-  const stats = getScheduleStats();
+  const stats = calculateStats();
 
-  if (loading) {
-    return (
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        }}
-      >
-        <Spin size="large" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div
-        style={{
-          padding: "24px",
-          background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-          minHeight: "100vh",
-        }}
-      >
-        <Alert message="Error" description={error} type="error" showIcon />
-      </div>
-    );
-  }
-
-  const dateCellRender = (date) => {
-    const daySchedule = schedule.filter((lesson) => {
-      const lessonDate = new Date(lesson.date);
-      return lessonDate.toDateString() === date.toDateString();
-    });
+  const getStatusBadge = (status) => {
+    const variants = {
+      scheduled:
+        "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+      completed:
+        "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+      cancelled: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    };
 
     return (
-      <div className="events">
-        {daySchedule.map((lesson, index) => (
-          <LessonCard key={index}>
-            <div className="flex items-center justify-between">
-              <div>
-                <h4
-                  className="font-semibold text-lg"
-                  style={{ color: "#667eea" }}
-                >
-                  {lesson.subject}
-                </h4>
-                <p className="text-sm text-gray-600 mb-1">
-                  <BookOpen className="mr-1" />
-                  {lesson.module}
-                </p>
-                <p className="text-sm text-gray-600 mb-1">
-                  <ClockCircleOutlined className="mr-1" />
-                  {new Date(
-                    `2000-01-01T${lesson.start_time}`
-                  ).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}{" "}
-                  -{" "}
-                  {new Date(`2000-01-01T${lesson.end_time}`).toLocaleTimeString(
-                    [],
-                    {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <Users className="mr-1" />
-                  {lesson.group_name}
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-medium">
-                  <EnvironmentOutlined className="mr-1" />
-                  {lesson.room}
-                </p>
-                <Tag
-                  color={
-                    lesson.type === "lecture"
-                      ? "blue"
-                      : lesson.type === "lab"
-                      ? "green"
-                      : "orange"
-                  }
-                  style={{ marginTop: "4px" }}
-                >
-                  {lesson.type}
-                </Tag>
-              </div>
-            </div>
-          </LessonCard>
-        ))}
-      </div>
+      <Badge className={variants[status] || variants.scheduled}>
+        {status.charAt(0).toUpperCase() + status.slice(1)}
+      </Badge>
     );
   };
 
+  const handleTakeAttendance = (sessionId) => {
+    toast.info(`Attendance feature for session ${sessionId} coming soon!`);
+  };
+
+  const handleViewDetails = (sessionId) => {
+    toast.info(`Session details for ${sessionId} coming soon!`);
+  };
+
+  if (loading) {
+    return (
+      <StyledContainer>
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <Loader2 className="animate-spin h-12 w-12 text-[#667eea] mx-auto mb-4" />
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Loading your schedule...
+            </p>
+          </div>
+        </div>
+      </StyledContainer>
+    );
+  }
+
   return (
-    <div
-      style={{
-        padding: "24px",
-        background: "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
-        minHeight: "100vh",
-      }}
-    >
-      {/* Header Section */}
-      <Row justify="space-between" align="middle" style={{ marginBottom: 32 }}>
-        <Col>
+    <StyledContainer>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
           <ElegantLogo>
             <LogoIcon>
               <GraduationCap size={24} color="#ffffff" />
             </LogoIcon>
             <LogoText>Dirassati</LogoText>
           </ElegantLogo>
-          <StyledHeader>Teacher Schedule</StyledHeader>
-          <p style={{ color: "#666", fontSize: "1.1rem", margin: 0 }}>
-            View your teaching schedule and manage your classes effectively.
-          </p>
-        </Col>
-        <Col>
-          <HeaderActions>
-            <Select
-              value={selectedModule}
-              onChange={handleModuleChange}
-              style={{ width: 250 }}
-              placeholder="Select Module"
-              options={modules.map((module) => ({
-                value: module.id,
-                label: module.name,
-              }))}
-            />
-            <Select
-              defaultValue="month"
-              style={{ width: 120 }}
-              options={[
-                { value: "month", label: "Monthly" },
-                { value: "week", label: "Weekly" },
-              ]}
-            />
-            <DownloadOutlined
-              style={{
-                fontSize: "20px",
-                color: "#667eea",
-                cursor: "pointer",
-              }}
-              onClick={() => message.info("Export feature coming soon!")}
-            />
-          </HeaderActions>
-        </Col>
-      </Row>
+          <PageTitle>Teacher Schedule Dashboard</PageTitle>
+          <PageSubtitle>
+            Manage your teaching schedule, track attendance, and monitor student
+            progress
+          </PageSubtitle>
+        </div>
 
-      {/* Quick Stats */}
-      <QuickStats>
-        <StatCard>
-          <CalendarOutlined size={24} style={{ marginBottom: 8 }} />
-          <h3>{stats.thisWeek}</h3>
-          <p>Classes This Week</p>
-        </StatCard>
-        <StatCard>
-          <BookOpen size={24} style={{ marginBottom: 8 }} />
-          <h3>{stats.totalSubjects}</h3>
-          <p>Subjects</p>
-        </StatCard>
-        <StatCard>
-          <ClockCircleOutlined size={24} style={{ marginBottom: 8 }} />
-          <h3>{stats.totalHours}h</h3>
-          <p>Weekly Hours</p>
-        </StatCard>
-      </QuickStats>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Weekly Sessions
+                  </p>
+                  <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                    {stats.totalSessions}
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-full">
+                  <Calendar className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Filters Section */}
-      <StyledSection>
-        <StyledSubHeader>
-          <FilterOutlined /> Schedule Filters
-        </StyledSubHeader>
-        <FiltersSection>
-          <Row gutter={16} align="middle">
-            <Col xs={24} sm={12} md={8}>
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ display: "block", marginBottom: 8, fontWeight: 500 }}
-                >
-                  Filter by Module
-                </label>
-                <Select
-                  value={selectedModule}
-                  onChange={handleModuleChange}
-                  style={{ width: "100%" }}
-                  placeholder="All Modules"
-                  allowClear
-                  options={[
-                    { value: null, label: "All Modules" },
-                    ...modules.map((module) => ({
-                      value: module.id,
-                      label: module.name,
-                    })),
-                  ]}
-                />
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Subjects
+                  </p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">
+                    {stats.uniqueSubjects}
+                  </p>
+                </div>
+                <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-full">
+                  <BookOpen className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
               </div>
-            </Col>
-            <Col xs={24} sm={12} md={8}>
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ display: "block", marginBottom: 8, fontWeight: 500 }}
-                >
-                  View Type
-                </label>
-                <Select
-                  defaultValue="calendar"
-                  style={{ width: "100%" }}
-                  options={[
-                    { value: "calendar", label: "Calendar View" },
-                    { value: "list", label: "List View" },
-                  ]}
-                />
-              </div>
-            </Col>
-            <Col xs={24} sm={12} md={8}>
-              <div style={{ marginBottom: 16 }}>
-                <label
-                  style={{ display: "block", marginBottom: 8, fontWeight: 500 }}
-                >
-                  Quick Actions
-                </label>
-                <Button
-                  type="primary"
-                  onClick={() =>
-                    message.info("Print schedule feature coming soon!")
-                  }
-                  style={{ width: "100%" }}
-                >
-                  <DownloadOutlined /> Print Schedule
-                </Button>
-              </div>
-            </Col>
-          </Row>
-        </FiltersSection>
-      </StyledSection>
+            </CardContent>
+          </Card>
 
-      {/* Schedule Calendar */}
-      <StyledSection>
-        <StyledSubHeader>
-          <CalendarOutlined /> Teaching Schedule
-        </StyledSubHeader>
-        <ScheduleCard>
-          <Calendar
-            dateCellRender={dateCellRender}
-            mode="month"
-            style={{ width: "100%" }}
-          />
-        </ScheduleCard>
-      </StyledSection>
-    </div>
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Groups
+                  </p>
+                  <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    {stats.uniqueGroups}
+                  </p>
+                </div>
+                <div className="p-3 bg-purple-100 dark:bg-purple-900/20 rounded-full">
+                  <Users className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Total Students
+                  </p>
+                  <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
+                    {stats.totalStudents}
+                  </p>
+                </div>
+                <div className="p-3 bg-orange-100 dark:bg-orange-900/20 rounded-full">
+                  <User className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                    Avg Attendance
+                  </p>
+                  <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                    {stats.avgAttendance}%
+                  </p>
+                </div>
+                <div className="p-3 bg-emerald-100 dark:bg-emerald-900/20 rounded-full">
+                  <UserCheck className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* View Toggle */}
+        <div className="mb-6">
+          <Tabs value={selectedView} onValueChange={setSelectedView}>
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="calendar" className="flex items-center gap-2">
+                <CalendarDays className="w-4 h-4" />
+                Calendar View
+              </TabsTrigger>
+              <TabsTrigger value="list" className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" />
+                List View
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="calendar" className="mt-6">
+              {/* Weekly Schedule Grid */}
+              <div className="bg-white/95 backdrop-blur-sm border-0 shadow-2xl rounded-3xl overflow-hidden mb-8">
+                <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-100">
+                  <div className="flex bg-gradient-to-r from-slate-100 to-gray-100 border-b-2 border-gray-200 min-w-[828px] sm:min-w-[932px] lg:min-w-[1036px] xl:min-w-[1140px] 2xl:min-w-[1240px]">
+                    <div className="p-3 sm:p-4 lg:p-5 xl:p-6 flex items-center justify-center sticky left-0 bg-gradient-to-r from-slate-100 to-gray-100 z-10 border-r-2 border-gray-300 w-28 sm:w-32 lg:w-36 xl:w-40 flex-shrink-0">
+                      <div className="flex items-center gap-2 lg:gap-3">
+                        <div className="p-1.5 sm:p-2 lg:p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full">
+                          <Clock className="w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5 text-white" />
+                        </div>
+                        <span className="font-bold text-gray-800 text-sm sm:text-base lg:text-lg">
+                          Time
+                        </span>
+                      </div>
+                    </div>
+                    {dayOrder.map((dayKey) => (
+                      <div
+                        key={dayKey}
+                        className="p-3 sm:p-4 lg:p-5 xl:p-6 text-center border-l border-gray-200 w-[160px] sm:w-[180px] lg:w-[200px] xl:w-[220px] 2xl:w-[240px] flex-shrink-0"
+                      >
+                        <div className="flex flex-col items-center gap-1.5 sm:gap-2">
+                          <div className="p-1.5 sm:p-2 lg:p-2.5 xl:p-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full">
+                            <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 xl:w-5 xl:h-5 text-white" />
+                          </div>
+                          <span className="font-bold text-gray-800 text-sm sm:text-base lg:text-lg">
+                            {dayMap[dayKey]}
+                          </span>
+                          <span className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium">
+                            {dayKey === "d1" && "🌅 Morning"}
+                            {dayKey === "d2" && "📚 Learning"}
+                            {dayKey === "d3" && "🔬 Science"}
+                            {dayKey === "d4" && "📖 Study"}
+                            {dayKey === "d5" && "🎯 Focus"}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Schedule Rows */}
+                  {timeSlots.map((slot, index) => (
+                    <div
+                      key={slot}
+                      className={`flex border-b border-gray-100 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-indigo-50/50 transition-all duration-300 min-w-[828px] sm:min-w-[932px] lg:min-w-[1036px] xl:min-w-[1140px] 2xl:min-w-[1240px] ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50/30"
+                      }`}
+                    >
+                      {/* Time Cell */}
+                      <div className="p-3 sm:p-4 lg:p-5 xl:p-6 flex items-center justify-center border-r-2 border-gray-300 sticky left-0 bg-inherit z-10 w-28 sm:w-32 lg:w-36 xl:w-40 flex-shrink-0">
+                        <div className="text-center">
+                          <div className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-800 mb-0.5 sm:mb-1">
+                            {formatTimeSlot(slot)}
+                          </div>
+                          <div className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium">
+                            {slot === "08:00" && "Morning Session"}
+                            {slot === "10:00" && "Mid Morning"}
+                            {slot === "14:00" && "Afternoon Session"}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Day Cells */}
+                      {dayOrder.map((dayKey) => {
+                        const session = scheduleMatrix[slot][dayKey];
+
+                        return (
+                          <div
+                            key={dayKey}
+                            className="border-l border-gray-200 w-[160px] sm:w-[180px] lg:w-[200px] xl:w-[220px] 2xl:w-[240px] h-[140px] sm:h-[150px] lg:h-[160px] xl:h-[170px] 2xl:h-[180px] flex-shrink-0 flex items-stretch"
+                          >
+                            {session ? (
+                              <div
+                                className={`relative w-full h-full bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-lg sm:rounded-xl lg:rounded-2xl p-2 sm:p-3 lg:p-4 hover:shadow-lg hover:scale-[1.02] transition-all duration-300 cursor-pointer group overflow-hidden flex flex-col`}
+                              >
+                                {/* Subject Icon */}
+                                <div className="absolute top-2 right-2 sm:top-3 sm:right-3 lg:top-4 lg:right-4 z-10">
+                                  <div className="p-1 sm:p-1.5 lg:p-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full shadow-lg">
+                                    <BookOpen className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-white" />
+                                  </div>
+                                </div>
+
+                                {/* Card Content */}
+                                <div className="flex-1 flex flex-col justify-between pr-6 sm:pr-8 lg:pr-10 xl:pr-12">
+                                  {/* Subject Name */}
+                                  <div className="mb-1 sm:mb-1.5 lg:mb-2">
+                                    <h3 className="font-bold text-xs sm:text-sm lg:text-base xl:text-lg text-blue-700 leading-tight line-clamp-2">
+                                      {session.subject}
+                                    </h3>
+                                  </div>
+
+                                  {/* Group Info */}
+                                  <div className="flex items-center gap-1.5 sm:gap-2 mb-1.5 sm:mb-2">
+                                    <Users className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-gray-500 flex-shrink-0" />
+                                    <span className="text-xs sm:text-xs lg:text-sm font-medium text-gray-700 truncate">
+                                      {session.group.name}
+                                    </span>
+                                  </div>
+
+                                  {/* Location */}
+                                  <div className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 mb-2 sm:mb-2.5 lg:mb-3">
+                                    <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-gray-500 flex-shrink-0" />
+                                    <span className="text-xs sm:text-xs lg:text-sm text-gray-600 font-medium truncate">
+                                      {session.room}
+                                    </span>
+                                  </div>
+
+                                  {/* Attendance Badge */}
+                                  <div className="flex justify-between items-center mt-auto">
+                                    <span className="text-xs bg-green-100 px-2 py-1 rounded-full font-medium text-green-700">
+                                      {session.attendance.present}/
+                                      {session.attendance.total}
+                                    </span>
+                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                      <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 lg:w-4 lg:h-4 text-green-500" />
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center bg-gray-50/50 rounded-lg sm:rounded-xl lg:rounded-2xl border-2 border-gray-100 border-dashed">
+                                <div className="text-center text-gray-400">
+                                  <div className="text-xs sm:text-xs lg:text-sm font-medium">
+                                    Free Period
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="list" className="mt-6">
+              {/* Sessions List */}
+              <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+                      Your Teaching Sessions
+                    </CardTitle>
+                    <ShadcnButton className="bg-gradient-to-r from-[#667eea] to-[#764ba2] hover:from-[#667eea]/90 hover:to-[#764ba2]/90 text-white">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Add Session
+                    </ShadcnButton>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Subject</TableHead>
+                          <TableHead>Group</TableHead>
+                          <TableHead>Day & Time</TableHead>
+                          <TableHead>Room</TableHead>
+                          <TableHead>Attendance</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {scheduleData.map((session) => (
+                          <TableRow key={session.id}>
+                            <TableCell>
+                              <div className="flex items-center gap-3">
+                                <Avatar className="w-8 h-8">
+                                  <AvatarImage
+                                    src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${session.subject}`}
+                                  />
+                                  <AvatarFallback className="bg-gradient-to-r from-[#667eea] to-[#764ba2] text-white text-xs">
+                                    {session.subject.charAt(0)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div>
+                                  <p className="font-medium text-gray-900 dark:text-white">
+                                    {session.subject}
+                                  </p>
+                                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                                    {session.group.level.name}
+                                  </p>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                variant="outline"
+                                className="border-[#667eea]/30 text-[#667eea] dark:border-[#667eea]/50 dark:text-[#667eea]"
+                              >
+                                {session.group.name}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-600 dark:text-gray-300">
+                                  {dayMap[session.day]}{" "}
+                                  {formatTimeSlot(session.time)}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4 text-gray-400" />
+                                <span className="text-gray-600 dark:text-gray-300">
+                                  {session.room}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="space-y-1">
+                                <div className="flex items-center justify-between text-sm">
+                                  <span className="text-gray-600 dark:text-gray-400">
+                                    {session.attendance.present}/
+                                    {session.attendance.total}
+                                  </span>
+                                  <span className="text-gray-600 dark:text-gray-400">
+                                    {Math.round(
+                                      (session.attendance.present /
+                                        session.attendance.total) *
+                                        100
+                                    )}
+                                    %
+                                  </span>
+                                </div>
+                                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                  <div
+                                    className="bg-gradient-to-r from-[#667eea] to-[#764ba2] h-2 rounded-full transition-all duration-300"
+                                    style={{
+                                      width: `${
+                                        (session.attendance.present /
+                                          session.attendance.total) *
+                                        100
+                                      }%`,
+                                    }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              {getStatusBadge(session.status)}
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex gap-2">
+                                <ShadcnButton
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    handleTakeAttendance(session.id)
+                                  }
+                                  className="border-[#667eea]/30 text-[#667eea] hover:bg-[#667eea]/10"
+                                >
+                                  <UserCheck className="w-4 h-4" />
+                                </ShadcnButton>
+                                <ShadcnButton
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleViewDetails(session.id)}
+                                  className="border-[#764ba2]/30 text-[#764ba2] hover:bg-[#764ba2]/10"
+                                >
+                                  <Eye className="w-4 h-4" />
+                                </ShadcnButton>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Today's Summary */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Timer className="w-5 h-5 text-blue-600" />
+                Today's Sessions
+              </h3>
+              <div className="space-y-3">
+                {scheduleData
+                  .filter((s) => s.day === "d1")
+                  .slice(0, 3)
+                  .map((session, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-blue-50 rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-blue-900">
+                          {session.subject}
+                        </p>
+                        <p className="text-sm text-blue-700">
+                          {session.group.name} • {session.room}
+                        </p>
+                      </div>
+                      <Badge className="bg-blue-100 text-blue-800">
+                        {formatTimeSlot(session.time)}
+                      </Badge>
+                    </div>
+                  ))}
+                {scheduleData.filter((s) => s.day === "d1").length === 0 && (
+                  <p className="text-gray-500 text-center py-4">
+                    No sessions today
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-green-600" />
+                Performance Overview
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Average Attendance
+                  </span>
+                  <span className="font-semibold text-green-600 dark:text-green-400">
+                    {stats.avgAttendance}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Total Students
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {stats.totalStudents}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Active Groups
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {stats.uniqueGroups}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white/95 backdrop-blur-sm border-0 shadow-lg rounded-2xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-purple-600" />
+                Weekly Summary
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Total Sessions
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {stats.totalSessions}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Teaching Hours
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {Math.round(((stats.totalSessions * 2) / 60) * 10) / 10}h
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-gray-600 dark:text-gray-400">
+                    Subjects
+                  </span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {stats.uniqueSubjects}
+                  </span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </StyledContainer>
   );
 }

@@ -237,10 +237,10 @@ export default function UnapprovedStudents() {
 
   // Dummy data for levels
   const dummyLevels = [
-    { id: 1, name: "Grade 9" },
-    { id: 2, name: "Grade 10" },
-    { id: 3, name: "Grade 11" },
-    { id: 4, name: "Grade 12" },
+    { id: 1, name: "السنة التاسعة متوسط" },
+    { id: 2, name: "السنة الأولى ثانوي" },
+    { id: 3, name: "السنة الثانية ثانوي" },
+    { id: 4, name: "السنة الثالثة ثانوي" },
   ];
 
   // Dummy data for groups

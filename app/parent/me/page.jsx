@@ -28,27 +28,35 @@ export default function ParentProfilePage() {
     updated_at: "",
   });
 
+  // Dummy data for fallback
+  const dummyProfile = {
+    first_name: "Ahmed",
+    last_name: "Bouchama",
+    email: "ahmed.bouchama@email.com",
+    phone_number: "+213 555 123 456",
+    address: "123 Rue de l'Indépendance, Tlemcen, Algeria",
+    profile_picture:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+    is_email_verified: true,
+    is_phone_verified: true,
+    archived: false,
+    created_at: "2023-09-01T00:00:00Z",
+    updated_at: "2024-01-15T10:30:00Z",
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await apiCall("GET", "/api/parents/me", null, { token });
-        const parent = res.parent || res;
-
-        setProfile({
-          first_name: parent.first_name || "",
-          last_name: parent.last_name || "",
-          email: parent.email || "",
-          phone_number: parent.phone_number || "",
-          address: parent.address || "",
-          profile_picture: parent.profile_picture || "",
-          is_email_verified: parent.is_email_verified || false,
-          is_phone_verified: parent.is_phone_verified || false,
-          archived: parent.archived || false,
-          created_at: parent.created_at || "",
-          updated_at: parent.updated_at || "",
-        });
+        setLoading(true);
+        // Simulate API delay and use dummy data
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        setProfile(dummyProfile);
+        toast.info("Using demo data - API not available");
       } catch (err) {
-        toast.error("Failed to load parent profile");
+        console.warn("API call failed, using dummy data:", err.message);
+        // Use dummy data as fallback
+        setProfile(dummyProfile);
+        toast.info("Using demo data - API not available");
       } finally {
         setLoading(false);
       }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import apiCall from "@/components/utils/apiCall";
@@ -194,7 +194,7 @@ const ActionButton = styled(ShadcnButton)`
 `;
 
 export default function ParentProfile({ params }) {
-  const { id } = params;
+  const { id } = use(params);
   const router = useRouter();
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -229,7 +229,7 @@ export default function ParentProfile({ params }) {
       id: 1,
       first_name: "Amina",
       last_name: "Bouchama",
-      grade: "Grade 10",
+      grade: "السنة الأولى ثانوي",
       group: "Group A",
       enrollment_date: "2023-09-01",
     },
@@ -237,7 +237,7 @@ export default function ParentProfile({ params }) {
       id: 2,
       first_name: "Youssef",
       last_name: "Bouchama",
-      grade: "Grade 8",
+      grade: "السنة الثامنة متوسط",
       group: "Group B",
       enrollment_date: "2023-09-01",
     },
